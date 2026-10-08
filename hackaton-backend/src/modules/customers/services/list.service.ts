@@ -22,7 +22,7 @@ export async function listCustomers(
   if (actor.role === 'ADVISOR' && !actor.zoneId)
     throw new ForbiddenError('Asesor sin zona');
   const zoneId =
-    actor.role === 'ADVISOR' && query.scope !== 'all' ? actor.zoneId : null;
+    actor.role === 'ADVISOR' && query.scope === 'zone' ? actor.zoneId : null;
   const where: Prisma.CustomerWhereInput = {
     ...(zoneId ? { zoneId } : {}),
     ...(query.q

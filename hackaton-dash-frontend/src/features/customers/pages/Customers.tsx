@@ -72,11 +72,11 @@ export default function Customers(): JSX.Element {
           <select
             aria-label="Alcance"
             className="rounded border p-2"
-            value={params.get('scope') ?? 'zone'}
+            value={params.get('scope') ?? 'all'}
             onChange={(event) => setParam('scope', event.target.value)}
           >
-            <option value="zone">Mi zona</option>
             <option value="all">Todos</option>
+            <option value="zone">Mi zona</option>
           </select>
         )}
       </div>

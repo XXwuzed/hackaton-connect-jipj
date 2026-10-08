@@ -24,7 +24,7 @@ export const customersQuerySchema = pageSchema.extend({
   from: date.optional(),
   to: date.optional(),
   order: z.enum(['created_desc', 'points_desc']).default('created_desc'),
-  scope: z.enum(['zone', 'all']).default('zone'),
+  scope: z.enum(['zone', 'all']).default('all'), // El asesor ve todos los clientes por defecto
 });
 
 export type RegisterInput = z.infer<typeof registerSchema>;

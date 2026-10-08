@@ -279,7 +279,7 @@ describe.skipIf(process.env.RUN_DB_TESTS !== '1')(
       expect((await post('/public/customers').send(body)).status).toBe(409);
     });
 
-    it('excluye puntos vencidos y filtra clientes del asesor por zona salvo scope=all', async () => {
+    it('excluye puntos vencidos y muestra al asesor todos los clientes salvo scope=zone', async () => {
       const local = await customer(20);
       const remote = await customer(0, { zoneId: otherZoneId });
       await db.pointsLot.create({
@@ -293,11 +293,11 @@ describe.skipIf(process.env.RUN_DB_TESTS !== '1')(
       });
       expect(await getBalance(db, local.id)).toBe(20);
       const own = await request(app)
-        .get(`/api/customers?q=${remote.nationalId}`)
+        .get(`/api/customers?q=${remote.nationalId}&scope=zone`)
         .set('Cookie', advisorCookie);
       expect(own.body.data).toHaveLength(0);
       const all = await request(app)
-        .get(`/api/customers?q=${remote.nationalId}&scope=all`)
+        .get(`/api/customers?q=${remote.nationalId}`)
         .set('Cookie', advisorCookie);
       expect(all.body.data).toHaveLength(1);
     });
