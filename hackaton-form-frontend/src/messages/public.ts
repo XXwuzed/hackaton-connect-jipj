@@ -47,7 +47,8 @@ export const publicMessages = {
     submit: 'Quiero ser parte',
     busy: 'Creando tu inscripción…',
     privacy: 'Sin contraseñas. Tu cédula te identifica en tienda.',
-    invalidId: 'Revisa tu cédula: debe tener 10 dígitos y ser válida.',
+    invalidId:
+      'Cédula no válida: deben ser 10 dígitos de una cédula ecuatoriana real (provincia 01–24 y dígito verificador correcto).',
     missingConsent: 'Acepta el tratamiento de datos para continuar.',
     error:
       'No pudimos completar tu inscripción. Revisa los datos e inténtalo nuevamente.',

@@ -86,6 +86,14 @@ export default function CreateRedemption(): JSX.Element {
           onChange={(event) => setSearch(event.target.value)}
         />
       </label>
+      {search.trim().length < 2 && !customer && (
+        <p className="mt-2 text-sm text-gray-600">
+          Escribe al menos 2 caracteres de la cédula, nombre o correo.
+        </p>
+      )}
+      {search.trim().length >= 2 && customers.data?.data.length === 0 && (
+        <p className="mt-2 text-sm text-gray-600">Sin resultados.</p>
+      )}
       {!customer &&
         customers.data?.data.map((row) => (
           <button
@@ -120,6 +128,16 @@ export default function CreateRedemption(): JSX.Element {
             value={productSearch}
             onChange={(event) => setProductSearch(event.target.value)}
           />
+          {items.data?.data.length === 0 && (
+            <p className="mt-2 text-sm text-gray-600">
+              No hay productos canjeables para tu zona.
+            </p>
+          )}
+          {customer.pointsBalance === 0 && (
+            <p className="mt-2 text-sm text-amber-700">
+              Este cliente no tiene puntos vigentes; el canje será rechazado.
+            </p>
+          )}
           {items.data?.data.map((item) => (
             <button
               key={item.productId}

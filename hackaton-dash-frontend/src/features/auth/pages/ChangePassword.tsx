@@ -25,8 +25,8 @@ export default function ChangePassword(): JSX.Element {
     try {
       await changePassword(currentPassword, newPassword);
       navigate('/', { replace: true });
-    } catch {
-      setError(copy.changeError);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : copy.changeError);
     } finally {
       setBusy(false);
     }
@@ -60,7 +60,7 @@ export default function ChangePassword(): JSX.Element {
             <input
               type="password"
               autoComplete="new-password"
-              minLength={12}
+              minLength={8}
               value={newPassword}
               onChange={(event) => setNewPassword(event.target.value)}
               required
@@ -72,7 +72,7 @@ export default function ChangePassword(): JSX.Element {
             <input
               type="password"
               autoComplete="new-password"
-              minLength={12}
+              minLength={8}
               value={confirm}
               onChange={(event) => setConfirm(event.target.value)}
               required

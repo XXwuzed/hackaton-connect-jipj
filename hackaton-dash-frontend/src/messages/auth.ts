@@ -27,7 +27,7 @@ export const authMessages = {
     'Reemplaza tu contraseña temporal para empezar a usar tu espacio.',
   currentPassword: 'Contraseña actual',
   newPassword: 'Nueva contraseña',
-  passwordHint: 'Usa al menos 12 caracteres.',
+  passwordHint: 'Usa al menos 8 caracteres.',
   confirmPassword: 'Confirma tu nueva contraseña',
   changeSubmit: 'Guardar y continuar',
   changeBusy: 'Guardando…',

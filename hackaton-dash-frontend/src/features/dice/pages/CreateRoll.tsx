@@ -126,6 +126,14 @@ export default function CreateRoll(): JSX.Element {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
           />
+          {search.trim().length < 2 && !customer && (
+            <p className="mt-2 text-sm text-gray-600">
+              Escribe al menos 2 caracteres de la cédula, nombre o correo.
+            </p>
+          )}
+          {search.trim().length >= 2 && customers.data?.data.length === 0 && (
+            <p className="mt-2 text-sm text-gray-600">Sin resultados.</p>
+          )}
           {customers.data?.data.map((row) => (
             <button
               className="mt-2 block w-full rounded border p-2 text-left"
