@@ -1,32 +1,26 @@
-# Multi-stage Dockerfile para backend Node.js / Express (@club/api)
-FROM node:20-alpine AS base
+FROM node:20-bookworm-slim
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates openssl \
+    && rm -rf /var/lib/apt/lists/*
+RUN corepack enable && corepack prepare pnpm@10.0.0 --activate
+
 WORKDIR /app
-RUN corepack enable && corepack prepare pnpm@latest --activate
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY tsconfig.base.json ./
+COPY packages/contracts/package.json packages/contracts/package.json
+COPY packages/ui/package.json packages/ui/package.json
+COPY hackaton-backend/package.json hackaton-backend/package.json
+COPY hackaton-form-frontend/package.json hackaton-form-frontend/package.json
+COPY hackaton-dash-frontend/package.json hackaton-dash-frontend/package.json
+RUN pnpm install --frozen-lockfile
 
-FROM base AS builder
-WORKDIR /app
-COPY hackaton-backend ./hackaton-backend/
-WORKDIR /app/hackaton-backend
-RUN if [ -f package.json ]; then \
-      pnpm install && \
-      (if [ -d prisma ]; then pnpm prisma generate; fi) && \
-      (pnpm build || true); \
-    else \
-      mkdir -p dist && echo 'const http = require("http"); const server = http.createServer((req, res) => { res.writeHead(200, {"Content-Type": "application/json"}); res.end(JSON.stringify({ status: "ok", app: "Club Enlace API", timestamp: new Date().toISOString() })); }); server.listen(process.env.PORT || 3000, () => console.log("Servidor API escuchando en puerto 3000"));' > dist/server.js; \
-    fi
+COPY packages/contracts packages/contracts
+COPY hackaton-backend hackaton-backend
+RUN pnpm --filter @club/api exec prisma generate \
+    && pnpm --filter @club/api build
 
-FROM node:20-alpine AS runner
-WORKDIR /app
-ENV NODE_ENV=production
-ENV PORT=3000
-
-# Dependencias del sistema necesarias para Prisma en Alpine Linux
-RUN apk add --no-cache openssl libc6-compat
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
-COPY --from=builder /app/hackaton-backend ./
-
+ENV NODE_ENV=production PORT=3000
+USER node
 EXPOSE 3000
-
-# Ejecuta migraciones automáticas de Prisma si existen antes de arrancar el servidor
-CMD ["sh", "-c", "if [ -d prisma ]; then pnpm prisma migrate deploy || true; fi && node dist/server.js"]
+CMD ["node", "hackaton-backend/dist/server.js"]

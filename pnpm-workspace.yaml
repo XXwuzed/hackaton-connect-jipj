@@ -1,0 +1,19 @@
+packages:
+  - hackaton-backend
+  - hackaton-dash-frontend
+  - hackaton-form-frontend
+  - packages/*
+
+allowBuilds:
+  argon2: true
+  '@prisma/client': true
+  '@prisma/engines': true
+  esbuild: true
+  prisma: true
+
+onlyBuiltDependencies:
+  - argon2
+  - '@prisma/client'
+  - '@prisma/engines'
+  - esbuild
+  - prisma

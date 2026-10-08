@@ -1,0 +1,31 @@
+{
+  "name": "@club/admin-web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5174",
+    "build": "tsc -p tsconfig.json && vite build",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@club/contracts": "workspace:*",
+    "@club/ui": "workspace:*",
+    "@tanstack/react-query": "^5.0.0",
+    "leaflet": "1.9.4",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-leaflet": "4.2.1",
+    "react-router-dom": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/leaflet": "1.9.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "autoprefixer": "^10.0.0",
+    "postcss": "^8.0.0",
+    "tailwindcss": "^3.0.0",
+    "vite": "^5.0.0"
+  }
+}

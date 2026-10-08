@@ -1,65 +1,91 @@
 services:
-  # Base de datos PostgreSQL para producción (sin publicar puertos al host)
   postgres:
     image: postgres:16-alpine
     container_name: club_fidelizacion_postgres_prod
-    restart: always
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB:-farmaenlace_prod}
+      POSTGRES_USER: ${POSTGRES_USER:?required}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?required}
+      POSTGRES_DB: ${POSTGRES_DB:?required}
     volumes:
       - postgres_prod_data:/var/lib/postgresql/data
     networks:
       - internal_net
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB:-farmaenlace_prod}"]
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
       interval: 10s
       timeout: 5s
       retries: 5
 
-  # Backend API (@club/api en Express + Prisma)
-  backend:
+  migrate:
+    image: enlace-hermano-api:local
     build:
       context: .
       dockerfile: hackaton-backend/Dockerfile
-    container_name: club_fidelizacion_backend
-    restart: always
+    command:
+      ['pnpm', '--filter', '@club/api', 'exec', 'prisma', 'migrate', 'deploy']
     environment:
-      NODE_ENV: production
-      PORT: 3000
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-farmaenlace_prod}?schema=public
-      JWT_SECRET: ${JWT_SECRET}
-      CORS_ORIGIN: ${CORS_ORIGIN:-*}
-      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-us-east-1}
-      S3_BUCKET_NAME: ${S3_BUCKET_NAME:-}
+      DATABASE_URL: ${DATABASE_URL:?required}
     depends_on:
       postgres:
         condition: service_healthy
     networks:
       - internal_net
+    restart: 'no'
 
-  # Servidor web Nginx (Sirve frontends y hace proxy inverso a /api)
+  backend:
+    image: enlace-hermano-api:local
+    container_name: club_fidelizacion_backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: ${DATABASE_URL:?required}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?required}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?required}
+      CORS_ORIGINS: ${CORS_ORIGINS:?required}
+      CUSTOMER_WEB_URL: ${CUSTOMER_WEB_URL:?required}
+      ADMIN_WEB_URL: ${ADMIN_WEB_URL:?required}
+      CONSENT_VERSION: ${CONSENT_VERSION:?required}
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET:?required}
+      RESEND_API_KEY: ${RESEND_API_KEY:?required}
+      MAIL_FROM: ${MAIL_FROM:?required}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    networks:
+      - internal_net
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3000/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
   web:
     build:
       context: .
       dockerfile: docker/nginx/Dockerfile
     container_name: club_fidelizacion_web
-    restart: always
+    restart: unless-stopped
     ports:
-      # Puerto 80 expuesto únicamente para recibir tráfico filtrado de CloudFront
-      - "80:80"
+      - '80:80'
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - internal_net
 
 volumes:
-  # Volumen persistente para datos de PostgreSQL en producción
   postgres_prod_data:
     name: club_fidelizacion_postgres_prod_data
 
 networks:
-  # Red interna aislada sin exposición externa
   internal_net:
     driver: bridge

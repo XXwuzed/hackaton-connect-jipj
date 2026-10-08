@@ -1,0 +1,17 @@
+{
+  "synthetic": true,
+  "redeemables": [
+    {
+      "sku": "DEMO-001",
+      "pointsRequired": 15,
+      "discountPercent": null,
+      "zoneNames": ["Quito Norte", "Quito Sur", "Guayaquil Centro"]
+    },
+    {
+      "sku": "DEMO-002",
+      "pointsRequired": 25,
+      "discountPercent": 5,
+      "zoneNames": ["Quito Norte", "Quito Sur", "Guayaquil Centro"]
+    }
+  ]
+}

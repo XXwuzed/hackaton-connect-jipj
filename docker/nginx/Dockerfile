@@ -1,29 +1,26 @@
-# Compilación y empaquetado de frontends en Nginx para producción
-FROM node:20-alpine AS builder-form
+FROM node:20-bookworm-slim AS builder
+RUN corepack enable && corepack prepare pnpm@10.0.0 --activate
 WORKDIR /app
-RUN corepack enable && corepack prepare pnpm@latest --activate
-COPY hackaton-form-frontend ./hackaton-form-frontend
-RUN if [ -f hackaton-form-frontend/package.json ]; then \
-      cd hackaton-form-frontend && pnpm install && pnpm build && mv dist /dist; \
-    else \
-      mkdir -p /dist && echo "<!DOCTYPE html><html><head><title>Club Enlace</title></head><body><h1>Club Enlace - Formulario de Registro</h1></body></html>" > /dist/index.html; \
-    fi
 
-FROM node:20-alpine AS builder-dash
-WORKDIR /app
-RUN corepack enable && corepack prepare pnpm@latest --activate
-COPY hackaton-dash-frontend ./hackaton-dash-frontend
-RUN if [ -f hackaton-dash-frontend/package.json ]; then \
-      cd hackaton-dash-frontend && pnpm install && pnpm build && mv dist /dist; \
-    else \
-      mkdir -p /dist && echo "<!DOCTYPE html><html><head><title>Club Enlace Admin</title></head><body><h1>Club Enlace - Panel Intranet</h1></body></html>" > /dist/index.html; \
-    fi
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY tsconfig.base.json ./
+COPY packages/contracts/package.json packages/contracts/package.json
+COPY packages/ui/package.json packages/ui/package.json
+COPY hackaton-backend/package.json hackaton-backend/package.json
+COPY hackaton-form-frontend/package.json hackaton-form-frontend/package.json
+COPY hackaton-dash-frontend/package.json hackaton-dash-frontend/package.json
+RUN pnpm install --frozen-lockfile
 
-# Imagen final ligera de Nginx
-FROM nginx:alpine
+COPY packages/contracts packages/contracts
+COPY packages/ui packages/ui
+COPY hackaton-form-frontend hackaton-form-frontend
+COPY hackaton-dash-frontend hackaton-dash-frontend
+RUN pnpm --filter @club/customer-web build \
+    && pnpm --filter @club/admin-web build
+
+FROM nginx:stable-alpine
 COPY docker/nginx/nginx.conf /etc/nginx/nginx.conf
-COPY --from=builder-form /dist /usr/share/nginx/html/form
-COPY --from=builder-dash /dist /usr/share/nginx/html/admin
-
+COPY --from=builder /app/hackaton-form-frontend/dist /usr/share/nginx/html/form
+COPY --from=builder /app/hackaton-dash-frontend/dist /usr/share/nginx/html/admin
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]

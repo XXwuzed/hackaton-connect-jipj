@@ -11,6 +11,7 @@ node_modules/
 **/.env.*
 !.env.example
 !**/.env.example
+!.env.production.example
 *.pem
 *.key
 
@@ -19,9 +20,11 @@ node_modules/
 *.xls
 *.csv
 Suma_datacenter_master.xlsx
+hackaton-backend/prisma/mock/data/
 
-# Internal agent instructions (local only)
-agents/
+# Internal agent instructions (local only); STACK.md is shareable documentation.
+agents/*
+!agents/STACK.md
 
 # Build artifacts & caches
 dist/
@@ -46,6 +49,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+pnpm-lock.yaml.bak
+*.tsbuildinfo
 
 # OS and Editor files
 .DS_Store

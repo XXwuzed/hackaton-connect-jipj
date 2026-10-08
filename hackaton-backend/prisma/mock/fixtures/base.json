@@ -1,0 +1,70 @@
+{
+  "synthetic": true,
+  "company": {
+    "name": "Empresa Demo Sintética"
+  },
+  "zones": [
+    {
+      "name": "Quito Norte",
+      "centerLat": -0.13,
+      "centerLng": -78.48,
+      "radiusMeters": 3000
+    },
+    {
+      "name": "Quito Sur",
+      "centerLat": -0.27,
+      "centerLng": -78.54,
+      "radiusMeters": 3000
+    },
+    {
+      "name": "Guayaquil Centro",
+      "centerLat": -2.19,
+      "centerLng": -79.8875,
+      "radiusMeters": 3000
+    }
+  ],
+  "stores": [
+    {
+      "code": "FE-QN-001",
+      "name": "FarmaEnlace Quito Norte",
+      "zoneName": "Quito Norte"
+    },
+    {
+      "code": "FE-QS-001",
+      "name": "FarmaEnlace Quito Sur",
+      "zoneName": "Quito Sur"
+    },
+    {
+      "code": "FE-GYE-001",
+      "name": "FarmaEnlace Guayaquil Centro",
+      "zoneName": "Guayaquil Centro"
+    }
+  ],
+  "users": {
+    "admin": {
+      "email": "admin@farmaenlace.com",
+      "firstName": "Administrador",
+      "lastName": "FarmaEnlace"
+    },
+    "advisor": {
+      "email": "asesor@farmaenlace.com",
+      "firstName": "Asesor",
+      "lastName": "FarmaEnlace",
+      "storeCode": "FE-QN-001"
+    }
+  },
+  "products": [
+    {
+      "sku": "DEMO-001",
+      "name": "Producto Demo 1",
+      "description": "Dato sintético",
+      "pvp": "5.00"
+    },
+    {
+      "sku": "DEMO-002",
+      "name": "Producto Demo 2",
+      "description": "Dato sintético",
+      "pvp": "8.50"
+    }
+  ]
+}

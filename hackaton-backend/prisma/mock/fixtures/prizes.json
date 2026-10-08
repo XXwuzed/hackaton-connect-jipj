@@ -1,0 +1,9 @@
+{
+  "synthetic": true,
+  "prizes": [
+    {
+      "sku": "DEMO-002",
+      "zoneNames": ["Quito Norte", "Quito Sur", "Guayaquil Centro"]
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "name": "enlace-hermano",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.0.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "corepack pnpm --parallel --filter @club/api --filter @club/customer-web --filter @club/admin-web dev",
+    "build": "corepack pnpm -r --if-present build",
+    "typecheck": "corepack pnpm -r typecheck",
+    "lint": "eslint .",
+    "test": "corepack pnpm -r --if-present test",
+    "db:up": "docker compose up -d --wait",
+    "db:migrate": "corepack pnpm --filter @club/api exec prisma migrate dev",
+    "db:seed": "corepack pnpm --filter @club/api exec prisma db seed",
+    "db:seed:all": "corepack pnpm --filter @club/api seed:all:local",
+    "db:mock:customers": "corepack pnpm --filter @club/api mock:customers",
+    "db:mock:redeemables": "corepack pnpm --filter @club/api mock:redeemables",
+    "db:mock:prizes": "corepack pnpm --filter @club/api mock:prizes",
+    "db:mock:sales": "corepack pnpm --filter @club/api mock:sales",
+    "db:reset": "corepack pnpm --filter @club/api exec prisma migrate reset",
+    "knip": "knip",
+    "format:check": "prettier --check ."
+  },
+  "knip": {
+    "ignore": []
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "eslint": "^9.0.0",
+    "knip": "^5.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0",
+    "typescript-eslint": "^8.0.0"
+  }
+}
