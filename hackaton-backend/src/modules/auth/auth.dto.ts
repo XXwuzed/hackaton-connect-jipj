@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const PASSWORD_MIN_LENGTH = 8; // Igual que las credenciales demo (Admin123!)
+const PASSWORD_MIN_LENGTH = 8; // Igual que las credenciales demo (Admin123!)
 
 export const loginSchema = z
   .object({
