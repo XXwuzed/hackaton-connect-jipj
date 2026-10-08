@@ -1,14 +1,13 @@
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
-import { csvList, loadRows } from './shared';
+import { assertSeedAllowed, csvList, loadRows } from './shared';
 
 const rowSchema = z.object({
   sku: z.string().min(1),
   zoneNames: z.array(z.string().min(1)).min(1),
 });
 async function main() {
-  if (process.env.NODE_ENV === 'production')
-    throw new Error('No cargar mock en producción');
+  assertSeedAllowed();
   const { rows, source } = loadRows('prizes', 'prizes', rowSchema, (row) => ({
     sku: row.sku,
     zoneNames: csvList(row.zoneNames),

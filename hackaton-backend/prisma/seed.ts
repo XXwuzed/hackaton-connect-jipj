@@ -3,6 +3,9 @@ import { fileURLToPath } from 'node:url';
 import argon2 from 'argon2';
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
+import { assertSeedAllowed } from './mock/shared';
+
+const SEED_PASSWORD_MIN_LENGTH = 8; // Contraseñas demo del hackatón (ej. Admin123!)
 
 const baseSchema = z.object({
   synthetic: z.literal(true),
@@ -53,21 +56,19 @@ function loadBaseData() {
   return parsed.data;
 }
 
-/** Carga datos de demostración idempotentes, nunca en producción. */
+/** Carga datos de demostración idempotentes; en producción requiere opt-in. */
 async function main(): Promise<void> {
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error('El seed sintético no se ejecuta en producción');
-  }
+  assertSeedAllowed();
   const adminPassword = process.env.SEED_ADMIN_PASSWORD;
   const advisorPassword = process.env.SEED_ADVISOR_PASSWORD;
   if (
     !adminPassword ||
-    adminPassword.length < 12 ||
+    adminPassword.length < SEED_PASSWORD_MIN_LENGTH ||
     !advisorPassword ||
-    advisorPassword.length < 12
+    advisorPassword.length < SEED_PASSWORD_MIN_LENGTH
   ) {
     throw new Error(
-      'Configura SEED_ADMIN_PASSWORD y SEED_ADVISOR_PASSWORD (mínimo 12 caracteres)',
+      `Configura SEED_ADMIN_PASSWORD y SEED_ADVISOR_PASSWORD (mínimo ${SEED_PASSWORD_MIN_LENGTH} caracteres)`,
     );
   }
   const data = loadBaseData();
@@ -100,7 +101,14 @@ async function main(): Promise<void> {
         }),
         mustChangePassword: false,
       },
-      update: { firstName: admin.firstName, lastName: admin.lastName },
+      update: {
+        firstName: admin.firstName,
+        lastName: admin.lastName,
+        passwordHash: await argon2.hash(adminPassword, {
+          type: argon2.argon2id,
+        }),
+        active: true,
+      },
     });
     await prisma.user.upsert({
       where: { email: advisor.email },
@@ -118,10 +126,19 @@ async function main(): Promise<void> {
       update: {
         firstName: advisor.firstName,
         lastName: advisor.lastName,
+        passwordHash: await argon2.hash(advisorPassword, {
+          type: argon2.argon2id,
+        }),
+        active: true,
         companyId: company.id,
         zoneId: zone.id,
         storeId: store.id,
       },
+    });
+    await prisma.loyaltySettings.upsert({
+      where: { id: 1 },
+      create: { id: 1 },
+      update: {},
     });
     for (const product of data.products) {
       await prisma.product.upsert({

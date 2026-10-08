@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
-import { loadRows } from './shared';
+import { assertSeedAllowed, loadRows } from './shared';
 
 const rowSchema = z.object({
   sku: z.string().min(1),
@@ -8,8 +8,7 @@ const rowSchema = z.object({
   margin: z.number().min(-100).max(100),
 });
 async function main() {
-  if (process.env.NODE_ENV === 'production')
-    throw new Error('No cargar mock en producción');
+  assertSeedAllowed();
   const { rows, source } = loadRows('sales', 'sales', rowSchema, (row) => ({
     sku: row.sku,
     unitsSold: Number(row.unitsSold),

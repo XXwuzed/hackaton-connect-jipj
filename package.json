@@ -15,6 +15,7 @@
     "db:up": "docker compose up -d --wait",
     "db:migrate": "corepack pnpm --filter @club/api exec prisma migrate dev",
     "db:seed": "corepack pnpm --filter @club/api exec prisma db seed",
+    "db:seed:all": "corepack pnpm --filter @club/api seed:all:local",
     "db:mock:customers": "corepack pnpm --filter @club/api mock:customers",
     "db:mock:redeemables": "corepack pnpm --filter @club/api mock:redeemables",
     "db:mock:prizes": "corepack pnpm --filter @club/api mock:prizes",
