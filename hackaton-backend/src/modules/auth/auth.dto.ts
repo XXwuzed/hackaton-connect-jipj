@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+export const PASSWORD_MIN_LENGTH = 8; // Igual que las credenciales demo (Admin123!)
+
 export const loginSchema = z
   .object({
     email: z
@@ -14,7 +16,10 @@ export const loginSchema = z
 export const changePasswordSchema = z
   .object({
     currentPassword: z.string().min(1),
-    newPassword: z.string().min(12).max(128),
+    newPassword: z
+      .string()
+      .min(PASSWORD_MIN_LENGTH, `Mínimo ${PASSWORD_MIN_LENGTH} caracteres`)
+      .max(128),
   })
   .strict()
   .refine((value) => value.currentPassword !== value.newPassword, {

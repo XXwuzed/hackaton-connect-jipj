@@ -11,7 +11,14 @@ async function request<T>(
     },
     body: body ? JSON.stringify(body) : undefined,
   });
-  if (!response.ok) throw new Error('No se pudo completar la solicitud');
+  if (!response.ok) {
+    const payload = (await response.json().catch(() => null)) as {
+      error?: { message?: string };
+    } | null;
+    throw new Error(
+      payload?.error?.message ?? 'No se pudo completar la solicitud',
+    );
+  }
   return response.json() as Promise<T>;
 }
 

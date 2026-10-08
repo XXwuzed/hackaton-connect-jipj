@@ -7,6 +7,7 @@ export default function Profile(): JSX.Element {
   const [lastName, setLastName] = useState(user?.lastName ?? '');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   async function saveProfile() {
@@ -25,11 +26,17 @@ export default function Profile(): JSX.Element {
   }
   async function savePassword() {
     setError('');
+    setMessage('');
+    if (newPassword !== confirm) {
+      setError('Las contraseñas nuevas no coinciden');
+      return;
+    }
     try {
       await changePassword(currentPassword, newPassword);
       setMessage('Contraseña actualizada');
       setCurrentPassword('');
       setNewPassword('');
+      setConfirm('');
     } catch (cause) {
       setError(
         cause instanceof Error
@@ -66,28 +73,52 @@ export default function Profile(): JSX.Element {
         Guardar
       </button>
       <h2 className="mt-6 font-bold">Cambiar contraseña</h2>
-      <input
-        className="mt-2 block rounded border p-2"
-        aria-label="Contraseña actual"
-        type="password"
-        value={currentPassword}
-        onChange={(event) => setCurrentPassword(event.target.value)}
-      />
-      <input
-        className="mt-2 block rounded border p-2"
-        aria-label="Contraseña nueva"
-        type="password"
-        value={newPassword}
-        onChange={(event) => setNewPassword(event.target.value)}
-      />
+      <p className="text-sm text-gray-600">
+        Escribe tu contraseña actual y la nueva (mínimo 8 caracteres). La sesión
+        sigue abierta; la próxima vez entra con la nueva.
+      </p>
+      <label className="mt-2 block">
+        Contraseña actual
+        <input
+          className="block rounded border p-2"
+          type="password"
+          autoComplete="current-password"
+          value={currentPassword}
+          onChange={(event) => setCurrentPassword(event.target.value)}
+        />
+      </label>
+      <label className="mt-2 block">
+        Contraseña nueva
+        <input
+          className="block rounded border p-2"
+          type="password"
+          autoComplete="new-password"
+          value={newPassword}
+          onChange={(event) => setNewPassword(event.target.value)}
+        />
+      </label>
+      <label className="mt-2 block">
+        Confirmar contraseña nueva
+        <input
+          className="block rounded border p-2"
+          type="password"
+          autoComplete="new-password"
+          value={confirm}
+          onChange={(event) => setConfirm(event.target.value)}
+        />
+      </label>
       <button
-        className="mt-3 rounded bg-primary p-2 text-white"
-        disabled={!currentPassword || !newPassword}
+        className="mt-3 rounded bg-primary p-2 text-white disabled:opacity-50"
+        disabled={!currentPassword || newPassword.length < 8 || !confirm}
         onClick={savePassword}
       >
         Cambiar contraseña
       </button>
-      {message && <p role="status">{message}</p>}
+      {message && (
+        <p role="status" className="text-green-700">
+          {message}
+        </p>
+      )}
       {error && (
         <p role="alert" className="text-red-700">
           {error}

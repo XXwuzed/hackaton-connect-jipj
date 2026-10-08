@@ -53,8 +53,9 @@ export default function Register(): JSX.Element {
         storeCode,
       });
       window.location.assign('/success');
-    } catch {
-      setError(copy.error);
+    } catch (cause) {
+      // Muestra el motivo del backend (p. ej. cédula ya registrada).
+      setError(cause instanceof Error ? cause.message : copy.error);
     } finally {
       setBusy(false);
     }
@@ -132,7 +133,9 @@ export default function Register(): JSX.Element {
                 minLength={10}
                 placeholder={copy.nationalIdPlaceholder}
                 value={nationalId}
-                onChange={(event) => setNationalId(event.target.value)}
+                onChange={(event) =>
+                  setNationalId(event.target.value.replace(/\D/g, ''))
+                }
                 required
               />
             </label>
