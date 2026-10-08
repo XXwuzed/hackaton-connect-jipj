@@ -6,15 +6,15 @@ const response = {
 
 export const httpRateLimit = rateLimit({
   windowMs: 60_000,
-  limit: 100,
+  limit: 1000,
   standardHeaders: 'draft-7',
   legacyHeaders: false,
   message: response,
 });
 
 export const loginRateLimit = rateLimit({
-  windowMs: 15 * 60_000,
-  limit: 5,
+  windowMs: 5 * 60_000,
+  limit: 50,
   standardHeaders: 'draft-7',
   legacyHeaders: false,
   message: response,
@@ -28,8 +28,8 @@ export const loginRateLimit = rateLimit({
 });
 
 export const registrationRateLimit = rateLimit({
-  windowMs: 60 * 60_000,
-  limit: 10,
+  windowMs: 15 * 60_000,
+  limit: 100,
   standardHeaders: 'draft-7',
   legacyHeaders: false,
   message: response,
