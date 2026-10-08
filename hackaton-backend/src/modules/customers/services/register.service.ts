@@ -7,6 +7,7 @@ import { logger } from '../../../shared/logger';
 import { log } from '../../audit';
 import type { RegisterInput } from '../customers.dto';
 import type { RequestContext } from '../../auth/auth.types';
+import { sendWelcomeEmail } from './send-welcome.service';
 
 /** Inscribe una cédula única y envía bienvenida después del commit. */
 export async function registerCustomer(
@@ -87,12 +88,7 @@ export async function registerCustomer(
     throw error;
   }
   try {
-    const url = `${config.CUSTOMER_WEB_URL.replace(/\/$/, '')}/baja/${customer.unsubscribeToken}`;
-    await mailer.send(
-      customer.email,
-      'Bienvenido a EnlaceHermano',
-      `<p>Bienvenido a EnlaceHermano.</p><p>Si deseas darte de baja, visita <a href="${url}">este enlace</a>.</p>`,
-    );
+    await sendWelcomeEmail(mailer, config, customer);
   } catch (error) {
     logger.error(
       { err: error, customerId: customer.id },

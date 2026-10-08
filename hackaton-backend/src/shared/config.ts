@@ -17,7 +17,7 @@ const schema = z
     AWS_SECRET_ACCESS_KEY: z.string().min(1).optional(),
     AWS_SESSION_TOKEN: z.string().min(1).optional(),
     RESEND_API_KEY: z.string().min(1).optional(),
-    MAIL_FROM: z.string().email().optional(),
+    MAIL_FROM: z.string().email().default('onboarding@resend.dev'),
   })
   .superRefine((value, context) => {
     if (value.NODE_ENV === 'production') {
