@@ -1,0 +1,24 @@
+services:
+  # Base de datos PostgreSQL para desarrollo local y tests
+  postgres:
+    image: postgres:16-alpine
+    container_name: club_fidelizacion_postgres_dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-farmaenlace_dev}
+    ports:
+      # Expuesto únicamente para acceso local de herramientas y desarrollo
+      - "5432:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-farmaenlace_dev}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_dev_data:
+    name: club_fidelizacion_postgres_dev_data

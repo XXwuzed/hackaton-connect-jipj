@@ -1,0 +1,65 @@
+services:
+  # Base de datos PostgreSQL para producción (sin publicar puertos al host)
+  postgres:
+    image: postgres:16-alpine
+    container_name: club_fidelizacion_postgres_prod
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-farmaenlace_prod}
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    networks:
+      - internal_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB:-farmaenlace_prod}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API (@club/api en Express + Prisma)
+  backend:
+    build:
+      context: .
+      dockerfile: hackaton-backend/Dockerfile
+    container_name: club_fidelizacion_backend
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-farmaenlace_prod}?schema=public
+      JWT_SECRET: ${JWT_SECRET}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-us-east-1}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - internal_net
+
+  # Servidor web Nginx (Sirve frontends y hace proxy inverso a /api)
+  web:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+    container_name: club_fidelizacion_web
+    restart: always
+    ports:
+      # Puerto 80 expuesto únicamente para recibir tráfico filtrado de CloudFront
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - internal_net
+
+volumes:
+  # Volumen persistente para datos de PostgreSQL en producción
+  postgres_prod_data:
+    name: club_fidelizacion_postgres_prod_data
+
+networks:
+  # Red interna aislada sin exposición externa
+  internal_net:
+    driver: bridge
