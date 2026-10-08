@@ -22,9 +22,11 @@ ENV PORT=3000
 
 # Dependencias del sistema necesarias para Prisma en Alpine Linux
 RUN apk add --no-cache openssl libc6-compat
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
 COPY --from=builder /app/hackaton-backend ./
 
 EXPOSE 3000
 
-CMD ["node", "dist/server.js"]
+# Ejecuta migraciones automáticas de Prisma si existen antes de arrancar el servidor
+CMD ["sh", "-c", "if [ -d prisma ]; then pnpm prisma migrate deploy || true; fi && node dist/server.js"]
