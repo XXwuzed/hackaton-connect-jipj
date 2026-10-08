@@ -1,0 +1,37 @@
+export const authMessages = {
+  eyebrow: 'El bienestar nos conecta',
+  storyTitle: 'Detrás de cada beneficio,',
+  storyAccent: 'hay un gran equipo.',
+  storyDescription:
+    'Un espacio para cuidar cada conexión. Acompaña a nuestros clientes y haz que cada visita cuente.',
+  storyFooter: 'Personas que conectan. Beneficios que se comparten.',
+  team: 'Espacio para administradores y asesores',
+  loginTitle: 'Qué bueno verte de nuevo',
+  loginDescription: 'Ingresa con tu cuenta para continuar al panel.',
+  email: 'Correo electrónico',
+  emailPlaceholder: 'tu.correo@example.com',
+  password: 'Contraseña',
+  passwordPlaceholder: 'Ingresa tu contraseña',
+  showPassword: 'Mostrar contraseña',
+  hidePassword: 'Ocultar contraseña',
+  submit: 'Entrar a mi espacio',
+  busy: 'Ingresando…',
+  error: 'No se pudo iniciar sesión. Revisa tus credenciales.',
+  helpTitle: '¿Necesitas acceso?',
+  helpDescription:
+    'Tu administrador puede crear tu cuenta o restablecer tu contraseña.',
+  sessionNote: 'Tu espacio, con los permisos de tu equipo.',
+  footer: 'EnlaceHermano · Unidos por tu bienestar',
+  changeTitle: 'Haz tuya esta cuenta',
+  changeDescription:
+    'Reemplaza tu contraseña temporal para empezar a usar tu espacio.',
+  currentPassword: 'Contraseña actual',
+  newPassword: 'Nueva contraseña',
+  passwordHint: 'Usa al menos 12 caracteres.',
+  confirmPassword: 'Confirma tu nueva contraseña',
+  changeSubmit: 'Guardar y continuar',
+  changeBusy: 'Guardando…',
+  mismatch: 'Las contraseñas nuevas no coinciden.',
+  changeError:
+    'No se pudo cambiar la contraseña. Verifica la contraseña actual.',
+};

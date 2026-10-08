@@ -86,7 +86,7 @@ export default function Zones(): JSX.Element {
           <Circle
             center={[lat, lng]}
             radius={radius}
-            pathOptions={{ color: '#0b6b68' }}
+            pathOptions={{ color: '#087d83', fillColor: '#17bfc3' }}
           />
         </MapContainer>
       </div>

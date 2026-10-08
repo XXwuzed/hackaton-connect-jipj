@@ -1,11 +1,18 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { isValidNationalId } from '@club/contracts';
+import { ConnectionArt, Icon, type IconName } from '@club/ui';
 import { getStore, registerCustomer } from '../lib/api';
+import { PublicLayout } from '../components/PublicLayout';
+import { publicMessages } from '../messages/public';
+
+const copy = publicMessages.register;
+const benefitIcons: IconName[] = ['sparkle', 'gift', 'heart'];
 
 /** Inscribe desde el QR de una tienda, sin crear una cuenta del cliente. */
 export default function Register(): JSX.Element {
   const storeCode = new URLSearchParams(window.location.search).get('t') ?? '';
   const [store, setStore] = useState('');
+  const [storeError, setStoreError] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [nationalId, setNationalId] = useState('');
@@ -16,22 +23,21 @@ export default function Register(): JSX.Element {
   const [consent, setConsent] = useState(false);
   useEffect(() => {
     if (!storeCode) {
-      setError('Falta el código de tienda del QR.');
       return;
     }
     getStore(storeCode)
       .then((value) => setStore(`${value.name} · ${value.company}`))
-      .catch(() => setError('Esta tienda no está disponible.'));
+      .catch(() => setStoreError(copy.storeError));
   }, [storeCode]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!isValidNationalId(nationalId)) {
-      setError('La cédula no es válida.');
+      setError(copy.invalidId);
       return;
     }
     if (!consent) {
-      setError('Debes aceptar la política.');
+      setError(copy.missingConsent);
       return;
     }
     setBusy(true);
@@ -48,96 +54,164 @@ export default function Register(): JSX.Element {
       });
       window.location.assign('/success');
     } catch {
-      setError(
-        'No se pudo completar la inscripción. Revisa los datos e inténtalo nuevamente.',
-      );
+      setError(copy.error);
     } finally {
       setBusy(false);
     }
   }
   return (
-    <main className="mx-auto max-w-md p-6">
-      <h1 className="text-2xl font-bold text-primary">EnlaceHermano</h1>
-      <p className="mt-2">
-        Registro gratuito para la demostración con datos sintéticos.
-      </p>
-      <p className="mt-3 font-medium" role="status">
-        {store || 'Consultando tienda…'}
-      </p>
-      <form onSubmit={(event) => void submit(event)} className="mt-6 space-y-4">
-        <label className="block">
-          Cédula
-          <input
-            className="mt-1 w-full rounded border p-2"
-            inputMode="numeric"
-            maxLength={10}
-            value={nationalId}
-            onChange={(event) => setNationalId(event.target.value)}
-            required
-          />
-        </label>
-        <label className="block">
-          Nombre
-          <input
-            className="mt-1 w-full rounded border p-2"
-            autoComplete="given-name"
-            value={firstName}
-            onChange={(event) => setFirstName(event.target.value)}
-            required
-          />
-        </label>
-        <label className="block">
-          Apellido
-          <input
-            className="mt-1 w-full rounded border p-2"
-            autoComplete="family-name"
-            value={lastName}
-            onChange={(event) => setLastName(event.target.value)}
-            required
-          />
-        </label>
-        <label className="block">
-          Correo
-          <input
-            className="mt-1 w-full rounded border p-2"
-            type="email"
-            autoComplete="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-          />
-        </label>
-        <label className="block">
-          Teléfono (opcional)
-          <input
-            className="mt-1 w-full rounded border p-2"
-            type="tel"
-            autoComplete="tel"
-            value={phone}
-            onChange={(event) => setPhone(event.target.value)}
-          />
-        </label>
-        <label className="flex gap-2">
-          <input
-            type="checkbox"
-            checked={consent}
-            onChange={(event) => setConsent(event.target.checked)}
-            required
-          />
-          <span>Acepto el tratamiento de datos para esta demostración.</span>
-        </label>
-        {error && (
-          <p role="alert" className="text-red-700">
-            {error}
-          </p>
-        )}
-        <button
-          className="rounded bg-primary px-4 py-2 text-white disabled:opacity-50"
-          disabled={busy || !store}
-        >
-          {busy ? 'Enviando…' : 'Inscribirme'}
-        </button>
-      </form>
-    </main>
+    <PublicLayout>
+      <main id="main-content" className="registration-layout">
+        <section className="registration-story" aria-labelledby="welcome-title">
+          <p className="eyebrow">{copy.eyebrow}</p>
+          <h1 id="welcome-title">
+            {copy.title}
+            <br />
+            <span>{copy.titleAccent}</span>
+          </h1>
+          <p className="story-description">{copy.description}</p>
+          <div className="benefit-list">
+            {copy.benefits.map((benefit, index) => (
+              <div className="benefit" key={benefit.title}>
+                <span
+                  className={`icon-tile ${index === 1 ? 'icon-tile--coral' : index === 2 ? 'icon-tile--yellow' : ''}`}
+                >
+                  <Icon name={benefitIcons[index] ?? 'heart'} />
+                </span>
+                <div>
+                  <h2>{benefit.title}</h2>
+                  <p>{benefit.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="story-art">
+            <ConnectionArt />
+            <p className="community-note">
+              <span className="community-dots" aria-hidden="true">
+                <span />
+                <span />
+                <span />
+              </span>
+              {copy.community}
+            </p>
+          </div>
+        </section>
+        <section className="registration-card" aria-labelledby="register-title">
+          <div className="card-intro">
+            <span className="icon-tile">
+              <Icon name="user" />
+            </span>
+            <div>
+              <h2 id="register-title">{copy.formTitle}</h2>
+              <p>{copy.formDescription}</p>
+            </div>
+          </div>
+          <div
+            className={`store-context${!store ? ' store-context--unavailable' : ''}`}
+            role="status"
+          >
+            <Icon name="store" />
+            <span>
+              {store ||
+                storeError ||
+                (storeCode ? copy.storeLoading : copy.noStore)}
+            </span>
+          </div>
+          <form
+            onSubmit={(event) => void submit(event)}
+            className="form-stack"
+            aria-busy={busy}
+          >
+            <label className="field">
+              {copy.nationalId}
+              <input
+                name="nationalId"
+                inputMode="numeric"
+                maxLength={10}
+                minLength={10}
+                placeholder={copy.nationalIdPlaceholder}
+                value={nationalId}
+                onChange={(event) => setNationalId(event.target.value)}
+                required
+              />
+            </label>
+            <div className="fields-row">
+              <label className="field">
+                {copy.firstName}
+                <input
+                  name="firstName"
+                  autoComplete="given-name"
+                  placeholder={copy.firstNamePlaceholder}
+                  value={firstName}
+                  onChange={(event) => setFirstName(event.target.value)}
+                  required
+                />
+              </label>
+              <label className="field">
+                {copy.lastName}
+                <input
+                  name="lastName"
+                  autoComplete="family-name"
+                  placeholder={copy.lastNamePlaceholder}
+                  value={lastName}
+                  onChange={(event) => setLastName(event.target.value)}
+                  required
+                />
+              </label>
+            </div>
+            <label className="field">
+              {copy.email}
+              <input
+                name="email"
+                type="email"
+                autoComplete="email"
+                placeholder={copy.emailPlaceholder}
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                required
+              />
+            </label>
+            <label className="field">
+              <span className="field-label">
+                {copy.phone}
+                <small>{copy.optional}</small>
+              </span>
+              <input
+                name="phone"
+                type="tel"
+                autoComplete="tel"
+                placeholder={copy.phonePlaceholder}
+                value={phone}
+                onChange={(event) => setPhone(event.target.value)}
+              />
+            </label>
+            <label className="consent">
+              <input
+                type="checkbox"
+                checked={consent}
+                onChange={(event) => setConsent(event.target.checked)}
+                required
+              />
+              <span>{copy.consent}</span>
+            </label>
+            {error && <p role="alert">{error}</p>}
+            <button
+              type="submit"
+              className="button button--primary button--full"
+              disabled={busy || !store}
+            >
+              {busy ? copy.busy : copy.submit}
+              <Icon name="arrow" />
+            </button>
+            <p className="quiet-note">
+              <Icon name="shield" />
+              {copy.privacy}
+            </p>
+            <p className="demo-note">{publicMessages.demo}</p>
+          </form>
+        </section>
+      </main>
+    </PublicLayout>
   );
 }

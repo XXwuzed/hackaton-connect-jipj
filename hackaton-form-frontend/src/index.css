@@ -1,7 +1,299 @@
+@import '@club/ui/styles.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-neutral-50 text-neutral-900;
+.public-shell {
+  min-height: 100svh;
+  padding: 0 6%;
+  max-width: 1600px;
+  margin: auto;
+}
+.public-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 104px;
+  gap: 20px;
+  border-bottom: 1px solid #08496412;
+}
+.header-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.header-note svg {
+  color: var(--turquoise-dark);
+  width: 17px;
+}
+.registration-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: clamp(32px, 6vw, 100px);
+  padding: 52px 0 64px;
+}
+.registration-story h1 {
+  margin: 20px 0 22px;
+  max-width: 540px;
+  font-size: clamp(42px, 4.5vw, 65px);
+  line-height: 1.08;
+  font-weight: 750;
+  letter-spacing: -2.8px;
+}
+.registration-story h1 span {
+  color: var(--coral-dark);
+}
+.story-description {
+  font-size: 16px;
+  max-width: 390px;
+  line-height: 1.8;
+  color: var(--muted);
+}
+.benefit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 21px;
+  margin-top: 32px;
+}
+.benefit {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.benefit h2 {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 3px;
+}
+.benefit p {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.story-art {
+  position: relative;
+  max-width: 410px;
+  margin: 4px 0 0 -15px;
+}
+.story-art .connection-art {
+  width: 92%;
+}
+.community-note {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin: -8px 0 0 20px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.community-dots {
+  display: flex;
+}
+.community-dots span {
+  width: 26px;
+  height: 26px;
+  margin-left: -5px;
+  border: 3px solid var(--paper);
+  border-radius: 50%;
+  background: var(--turquoise);
+}
+.community-dots span:nth-child(2) {
+  background: var(--coral);
+}
+.community-dots span:nth-child(3) {
+  background: var(--yellow);
+}
+.registration-card {
+  width: 100%;
+  max-width: 500px;
+  justify-self: end;
+  background: var(--surface);
+  border: 1px solid #e6e9e5;
+  border-radius: 22px;
+  padding: clamp(26px, 3vw, 40px);
+  box-shadow: 0 16px 50px #08496406;
+}
+.card-intro {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.card-intro h2 {
+  font-size: 24px;
+  font-weight: 750;
+  letter-spacing: -0.8px;
+  margin-bottom: 4px;
+}
+.card-intro p {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.store-context {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #edf7f4;
+  border: 1px solid #dceddf;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-bottom: 24px;
+  color: var(--turquoise-dark);
+}
+.store-context--unavailable {
+  color: var(--muted);
+  background: var(--paper);
+  border-color: #e8e3d9;
+}
+.public-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+  padding: 23px 0 28px;
+  border-top: 1px solid #08496412;
+  font-size: 11px;
+  color: var(--muted);
+}
+.brand-palette {
+  display: flex;
+  gap: 5px;
+}
+.brand-palette span {
+  height: 5px;
+  width: 25px;
+  border-radius: 6px;
+  background: var(--ink);
+}
+.brand-palette span:nth-child(2) {
+  background: var(--turquoise);
+}
+.brand-palette span:nth-child(3) {
+  background: var(--coral);
+}
+.brand-palette span:nth-child(4) {
+  background: var(--yellow);
+}
+.confirmation-layout {
+  min-height: calc(100svh - 185px);
+  display: grid;
+  place-items: center;
+  padding: 45px 0;
+}
+.confirmation-card {
+  width: 100%;
+  max-width: 530px;
+  padding: 42px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  text-align: center;
+  box-shadow: 0 18px 60px #08496406;
+}
+.confirmation-card > .icon-tile {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 20px;
+  border-radius: 22px;
+}
+.confirmation-card > .icon-tile svg {
+  width: 30px;
+  height: 30px;
+}
+.confirmation-card h1 {
+  font-size: 32px;
+  line-height: 1.15;
+  font-weight: 750;
+  letter-spacing: -1px;
+  margin-bottom: 15px;
+}
+.confirmation-card > p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.8;
+  margin: 14px 0;
+}
+.confirmation-card .button {
+  margin-top: 18px;
+}
+.next-step {
+  margin-top: 26px;
+  border: 1px solid #dcebe5;
+  padding: 20px;
+  border-radius: 14px;
+  background: #f1f8f4;
+  text-align: left;
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+}
+.next-step > svg {
+  color: var(--turquoise-dark);
+  margin-top: 3px;
+}
+.next-step strong {
+  font-size: 13px;
+}
+.next-step p {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.7;
+  margin-top: 5px;
+}
+@media (max-width: 900px) {
+  .public-shell {
+    padding: 0 5%;
+  }
+  .registration-layout {
+    gap: 32px;
+  }
+  .registration-story h1 {
+    font-size: 43px;
+    letter-spacing: -1.8px;
+  }
+  .registration-card {
+    padding: 26px;
+  }
+}
+@media (max-width: 740px) {
+  .public-header {
+    min-height: 84px;
+  }
+  .header-note {
+    display: none;
+  }
+  .registration-layout {
+    grid-template-columns: 1fr;
+    padding-top: 32px;
+    gap: 30px;
+  }
+  .registration-story h1 {
+    margin: 15px 0;
+    max-width: 390px;
+  }
+  .story-description {
+    max-width: 100%;
+    font-size: 14px;
+  }
+  .story-art,
+  .benefit-list {
+    display: none;
+  }
+  .registration-card {
+    max-width: none;
+  }
+  .confirmation-card {
+    padding: 30px 24px;
+  }
+  .public-footer {
+    font-size: 10px;
+  }
 }

@@ -51,28 +51,30 @@ export default function Rotation(): JSX.Element {
       {query.isError && <p role="alert">No se pudo cargar la rotación.</p>}
       {query.data && (
         <>
-          <table className="w-full text-left">
-            <thead>
-              <tr>
-                <th>Producto</th>
-                <th>SKU</th>
-                <th>Unidades</th>
-                <th>Margen %</th>
-                <th>PVP</th>
-              </tr>
-            </thead>
-            <tbody>
-              {query.data.data.map((row) => (
-                <tr className="border-t" key={row.productId}>
-                  <td>{row.product.name}</td>
-                  <td>{row.product.sku}</td>
-                  <td>{row.unitsSold}</td>
-                  <td>{row.margin}</td>
-                  <td>${row.product.pvp}</td>
+          <div className="table-scroll">
+            <table className="w-full text-left">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>SKU</th>
+                  <th>Unidades</th>
+                  <th>Margen %</th>
+                  <th>PVP</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {query.data.data.map((row) => (
+                  <tr className="border-t" key={row.productId}>
+                    <td>{row.product.name}</td>
+                    <td>{row.product.sku}</td>
+                    <td>{row.unitsSold}</td>
+                    <td>{row.margin}</td>
+                    <td>${row.product.pvp}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
           <div className="mt-4 flex gap-4">
             <button
               disabled={page <= 1}

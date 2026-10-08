@@ -1,5 +1,10 @@
 import { useEffect, useState } from 'react';
 import { getUnsubscribeInfo, unsubscribe } from '../lib/api';
+import { Icon, LoadingState } from '@club/ui';
+import { PublicLayout } from '../components/PublicLayout';
+import { publicMessages } from '../messages/public';
+
+const copy = publicMessages.unsubscribe;
 
 /** Pide confirmación antes del POST para evitar bajas por escáneres de correo. */
 export default function Unsubscribe(): JSX.Element {
@@ -14,7 +19,7 @@ export default function Unsubscribe(): JSX.Element {
         setName(value.name);
         setStatus(value.status);
       })
-      .catch(() => setError('Enlace de baja no válido.'));
+      .catch(() => setError(copy.invalid));
   }, [token]);
 
   async function confirm() {
@@ -23,35 +28,43 @@ export default function Unsubscribe(): JSX.Element {
     try {
       setStatus((await unsubscribe(token)).status);
     } catch {
-      setError('No se pudo completar la baja.');
+      setError(copy.error);
     } finally {
       setBusy(false);
     }
   }
   return (
-    <main className="mx-auto max-w-md p-6">
-      <h1 className="text-2xl font-bold text-primary">Darse de baja</h1>
-      {name && <p className="mt-4">Cuenta de {name}</p>}
-      {status === 'UNSUBSCRIBED' ? (
-        <p className="mt-4" role="status">
-          La baja ya está registrada.
-        </p>
-      ) : (
-        name && (
-          <button
-            className="mt-4 rounded bg-primary px-4 py-2 text-white"
-            disabled={busy}
-            onClick={() => void confirm()}
-          >
-            {busy ? 'Procesando…' : 'Confirmar baja'}
-          </button>
-        )
-      )}
-      {error && (
-        <p className="mt-4 text-red-700" role="alert">
-          {error}
-        </p>
-      )}
-    </main>
+    <PublicLayout>
+      <main id="main-content" className="confirmation-layout">
+        <section className="confirmation-card">
+          <span className="icon-tile icon-tile--coral">
+            <Icon name={status === 'UNSUBSCRIBED' ? 'check' : 'heart'} />
+          </span>
+          <h1>{copy.title}</h1>
+          {name && (
+            <p>
+              {copy.member} <strong>{name}</strong>
+            </p>
+          )}
+          {status === 'UNSUBSCRIBED' ? (
+            <p role="status">{copy.done}</p>
+          ) : name ? (
+            <>
+              <p>{copy.description}</p>
+              <button
+                className="button button--primary"
+                disabled={busy}
+                onClick={() => void confirm()}
+              >
+                {busy ? copy.busy : copy.submit}
+              </button>
+            </>
+          ) : (
+            !error && <LoadingState label={copy.loading} />
+          )}
+          {error && <p role="alert">{error}</p>}
+        </section>
+      </main>
+    </PublicLayout>
   );
 }

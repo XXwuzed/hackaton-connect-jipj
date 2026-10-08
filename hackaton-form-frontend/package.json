@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@club/contracts": "workspace:*",
+    "@club/ui": "workspace:*",
     "react": "^18.0.0",
     "react-dom": "^18.0.0"
   },

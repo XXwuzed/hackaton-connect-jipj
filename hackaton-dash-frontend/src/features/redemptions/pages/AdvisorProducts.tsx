@@ -39,6 +39,7 @@ export default function AdvisorProducts(): JSX.Element {
             <img
               className="inline h-12 w-12 object-cover"
               alt=""
+              loading="lazy"
               src={item.product.imageUrl}
             />
           )}{' '}
