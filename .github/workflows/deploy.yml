@@ -3,7 +3,7 @@ name: Despliegue Continuo a EC2 (Club Enlace)
 on:
   push:
     branches:
-      - dev
+      - main
   workflow_dispatch:
 
 jobs:
@@ -32,11 +32,11 @@ jobs:
           COMMAND_ID=$(aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
-            --comment "CI/CD Auto-deploy rama dev" \
+            --comment "CI/CD Auto-deploy rama main" \
             --parameters 'commands=[
               "cd /opt/hackaton",
-              "git fetch origin dev",
-              "git reset --hard origin/dev",
+              "git fetch origin main",
+              "git reset --hard origin/main",
               "docker compose -f docker-compose.prod.yml up -d --build",
               "docker ps"
             ]' \
