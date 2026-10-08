@@ -5,16 +5,14 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 
 FROM base AS builder
 WORKDIR /app
-COPY hackaton-backend/package*.json ./hackaton-backend/
-COPY hackaton-backend/prisma ./hackaton-backend/prisma/
 COPY hackaton-backend ./hackaton-backend/
 WORKDIR /app/hackaton-backend
 RUN if [ -f package.json ]; then \
       pnpm install && \
-      (pnpm prisma generate || true) && \
+      (if [ -d prisma ]; then pnpm prisma generate; fi) && \
       (pnpm build || true); \
     else \
-      mkdir -p dist && echo 'console.log("Servidor backend inicializando...")' > dist/server.js; \
+      mkdir -p dist && echo 'console.log("Servidor backend inicializado...")' > dist/server.js; \
     fi
 
 FROM node:20-alpine AS runner
