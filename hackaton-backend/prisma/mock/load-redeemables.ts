@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
-import { csvList, loadRows } from './shared';
+import { assertSeedAllowed, csvList, loadRows } from './shared';
 
 const rowSchema = z.object({
   sku: z.string().min(1),
@@ -10,8 +10,7 @@ const rowSchema = z.object({
 });
 
 async function main() {
-  if (process.env.NODE_ENV === 'production')
-    throw new Error('No cargar mock en producción');
+  assertSeedAllowed();
   const { rows, source } = loadRows(
     'redeemables',
     'redeemables',

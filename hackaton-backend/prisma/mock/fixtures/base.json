@@ -1,23 +1,28 @@
 {
   "synthetic": true,
-  "company": { "name": "Empresa Demo Sintética" },
+  "company": {
+    "name": "Empresa Demo Sintética"
+  },
   "zone": {
     "name": "Zona Demo Sintética",
     "centerLat": -0.180653,
     "centerLng": -78.467834,
     "radiusMeters": 1000
   },
-  "store": { "code": "DEMO001", "name": "Tienda Demo Sintética" },
+  "store": {
+    "code": "DEMO001",
+    "name": "Tienda Demo Sintética"
+  },
   "users": {
     "admin": {
-      "email": "admin@example.com",
-      "firstName": "Admin",
-      "lastName": "Demo"
+      "email": "admin@farmaenlace.com",
+      "firstName": "Administrador",
+      "lastName": "FarmaEnlace"
     },
     "advisor": {
-      "email": "advisor@example.com",
+      "email": "asesor@farmaenlace.com",
       "firstName": "Asesor",
-      "lastName": "Demo"
+      "lastName": "FarmaEnlace"
     }
   },
   "products": [

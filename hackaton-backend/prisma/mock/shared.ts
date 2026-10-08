@@ -57,3 +57,15 @@ export function csvList(value: string | undefined): string[] {
     .map((item) => item.trim())
     .filter(Boolean);
 }
+
+/** Bloquea datos sintéticos en producción salvo opt-in explícito (hackatón). */
+export function assertSeedAllowed(): void {
+  if (
+    process.env.NODE_ENV === 'production' &&
+    process.env.SEED_ALLOW_PRODUCTION !== 'true'
+  ) {
+    throw new Error(
+      'Datos sintéticos bloqueados en producción; usa SEED_ALLOW_PRODUCTION=true',
+    );
+  }
+}

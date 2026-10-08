@@ -11,7 +11,9 @@
     "mock:customers": "node --env-file=.env --import tsx prisma/mock/load-customers.ts",
     "mock:redeemables": "node --env-file=.env --import tsx prisma/mock/load-redeemables.ts",
     "mock:prizes": "node --env-file=.env --import tsx prisma/mock/load-prizes.ts",
-    "mock:sales": "node --env-file=.env --import tsx prisma/mock/load-sales.ts"
+    "mock:sales": "node --env-file=.env --import tsx prisma/mock/load-sales.ts",
+    "seed:all": "tsx prisma/seed-all.ts",
+    "seed:all:local": "node --env-file=.env --import tsx prisma/seed-all.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
