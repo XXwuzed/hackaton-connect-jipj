@@ -1,0 +1,55 @@
+name: Verificar monorepo
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: club
+          POSTGRES_PASSWORD: club_test_password
+          POSTGRES_DB: club_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U club -d club_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://club:club_test_password@localhost:5432/club_test
+      RUN_DB_TESTS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.0.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @club/api exec prisma generate
+      - run: pnpm --filter @club/api exec prisma migrate deploy
+      - run: pnpm -r typecheck
+      - run: pnpm exec eslint .
+      - run: pnpm exec knip
+      - run: pnpm exec prettier --check .
+      - run: pnpm -r --if-present build
+      - run: pnpm -r --if-present test
+      - run: bash -n scripts/deploy.sh
+      - run: docker compose --env-file .env.production.example -f docker-compose.prod.yml config --quiet
+      - run: docker build -t club-enlace-api:ci -f hackaton-backend/Dockerfile .
+      - run: docker build --build-arg VITE_RECAPTCHA_SITE_KEY=ci-public-key -t club-enlace-web:ci -f docker/nginx/Dockerfile .
+      - run: docker run --rm --add-host backend:127.0.0.1 club-enlace-web:ci nginx -t

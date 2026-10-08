@@ -43,3 +43,11 @@
 - Verificaciones locales: `pnpm -r typecheck` pasó; `pnpm lint` pasó; `pnpm knip` pasó; `pnpm format:check` pasó; `pnpm build` compiló API y ambos frontends. `pnpm test`: **18 pasaron, 14 omitidas** (integración PostgreSQL). Las pruebas de integración están escritas, pero se omiten hasta tener PostgreSQL `club_test` y ejecutar `RUN_DB_TESTS=1`. No se afirma que los flujos transaccionales estén validados en base real.
 - Pendiente de prueba manual: navegador (restricción de `agents/instructions_1.md`), correo Resend, reCAPTCHA real, subida/lectura S3 y mapa con teselas OSM. Tampoco se han ejecutado seed ni loaders, pues este equipo no tiene PostgreSQL/Docker y el usuario eligió dejar esas pruebas pendientes.
 - Para completar la validación cuando se autorice un entorno: aplicar migración, ejecutar seed y loaders `db:mock:*`, correr integración contra `club_test`, revisar flujos en navegador autorizado y resolver TLS hasta origen antes de desplegar.
+
+## 2026-10-08 · Validación AWS y preparación de producción
+
+- El código de Fases 1A–5 se publicó en `main` (`fa42231`). Las distribuciones actuales todavía sirven HTML/API placeholder desde `dev`; el health del stub no consulta PostgreSQL.
+- Verificado en AWS: EC2 `t3.medium` Amazon Linux 2023 y SSM Online; SG sólo puerto 80 desde CloudFront; dos distribuciones con caché desactivada y cookies reenviadas; bucket privado S3, cifrado SSE-S3, CORS para ambos dominios; rol EC2 con acceso S3 y hop limit IMDSv2 de 2.
+- La EC2 conserva el checkout `dev` y el volumen `club_fidelizacion_postgres_prod_data`. Su `.env` aún utiliza nombres antiguos y carece de las variables requeridas por el código actual.
+- Se incorporaron Dockerfiles del workspace real, nginx, Compose de producción, CI con PostgreSQL aislado y despliegue manual vía SSM en worktree separado. Ningún archivo de producción nuevo se ha desplegado en EC2 en esta fase.
+- Pendientes: resultado efectivo del nuevo CI con las 14 pruebas de integración, completar `.env` de EC2, backup/restore PostgreSQL, resolver TLS y autenticación al origen, validar servicios externos y ejecutar manualmente el despliegue sólo después de esas puertas.

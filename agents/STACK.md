@@ -13,10 +13,10 @@ Fecha: 2026-10-08 (America/Guayaquil).
 | Borde previsto | CloudFront con HTTPS al visitante y origen EC2 restringido al prefix list de CloudFront               |
 | Datos          | Solo datos sintéticos; compras/pagos reales y datos personales reales están prohibidos en AWS Sandbox |
 
-No se usa Next.js ni FastAPI. Los dos frontends son proyectos distintos dentro del mismo monorepo, pero comparten URL pública. El panel usa cookies JWT HTTP-only; la UI solo oculta opciones, el API impone permisos.
+No se usa Next.js ni FastAPI. Los dos frontends son proyectos distintos dentro del mismo monorepo, servidos por nginx a través de dos distribuciones CloudFront. El panel usa cookies JWT HTTP-only; la UI solo oculta opciones, el API impone permisos.
 
-La EC2 ya existía antes del PROMPT 2. **No instalar ni desplegar nada en AWS durante la implementación local de Fases 1B–5.** El código no implica que el servicio esté desplegado.
+La EC2 ya existía antes del PROMPT 2. El código de Fases 1B–5 se implementó sin desplegarlo. La validación AWS posterior comprobó que la EC2 sigue sirviendo placeholders; `docs/DEPLOYMENT.md` documenta el estado y los bloqueos actuales.
 
-El plan inicial CloudFront → EC2 por HTTP/80 cifra el tramo visitante → CloudFront, pero no CloudFront → EC2; además, contradice la regla HTTPS de `agents/instructions_1.md`. Antes de desplegar se debe resolver expresamente ese conflicto (TLS hasta el origen o una excepción explícita solo para la demo sintética). Para datos reales hay que cifrar también el origen y revisar dominio/certificado. El Security Group con prefix list permite otras distribuciones de CloudFront; antes de exponer el origen, nginx debe validar una cabecera privada añadida por nuestra distribución. `/api/*` requiere caché deshabilitada y reenvío de cookies, cabeceras y parámetros. Nada de esto está desplegado todavía.
+CloudFront → EC2 está realmente configurado por HTTP/80: cifra visitante → CloudFront, pero no el origen, y contradice la regla HTTPS de `agents/instructions_1.md`. No usar datos reales hasta cifrar también el origen y limitarlo a nuestras distribuciones con una cabecera privada u otro control equivalente. `/api/*` tiene caché deshabilitada y reenvío de cookies, cabeceras y parámetros en CloudFront. La app nueva todavía no se desplegó.
 
 Alcance funcional vigente: compras en punto de venta, no pagos online; dados físicos registrados por asesor. La inscripción, canjes, dados, productos y dashboard están implementados en código para fases 2–5, pendientes de integración con PostgreSQL y de prueba manual autorizada. No ampliar el negocio por la tabla de infraestructura sin una decisión explícita.

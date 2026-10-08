@@ -20,6 +20,9 @@
 ├── packages/contracts/       # @club/contracts: zod y tipos compartidos
 ├── docs/                     # arquitectura, reglas, decisiones, avance y API
 ├── docker-compose.yml        # PostgreSQL local únicamente
+├── docker-compose.prod.yml   # nginx, API, migración y PostgreSQL en EC2
+├── docker/nginx/              # compilación estática y proxy /api
+├── .github/workflows/        # CI con PostgreSQL aislado y despliegue manual
 ├── package.json              # comandos del workspace
 └── pnpm-workspace.yaml
 ```
@@ -34,6 +37,6 @@ El flujo es router → middlewares → service → Prisma/audit. `redemptions` b
 
 ## Límites
 
-No hay pagos en línea, endpoint para sumar puntos, jobs de vencimiento, Redis, tercer frontend ni otro ORM. El factor de puntos visual nunca toca la contabilidad. Datos base y mocks se cargan con `seed.ts` y `prisma/mock/load-*.ts`, no desde pantallas. Las imágenes viven en S3; PostgreSQL guarda únicamente `imageKey`. El panel sirve React estático en `/admin`, el formulario en `/`, y nginx previsto reenvía `/api` a Express. No se ha desplegado el código de Fases 1B–5 en AWS.
+No hay pagos en línea, endpoint para sumar puntos, jobs de vencimiento, Redis, tercer frontend ni otro ORM. El factor de puntos visual nunca toca la contabilidad. Datos base y mocks se cargan con `seed.ts` y `prisma/mock/load-*.ts`, no desde pantallas. Las imágenes viven en S3; PostgreSQL guarda únicamente `imageKey`. El panel sirve React estático en `/admin`, el formulario en `/`, y nginx reenvía `/api` a Express. No se ha desplegado el código de Fases 1B–5 en AWS.
 
 Las pantallas y rutas de base de datos todavía requieren pruebas de integración sobre `club_test`. Las credenciales externas se inyectan por entorno y no se han probado manualmente. Antes de producción, además de dichas pruebas, se debe resolver el cifrado CloudFront→origen descrito en `agents/STACK.md`.

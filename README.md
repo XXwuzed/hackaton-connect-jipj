@@ -1,6 +1,6 @@
 # Club de Fidelización Farmaenlace
 
-Monorepo del club: API Express/Prisma, formulario público y panel interno React/Vite. El código de las fases 1A–5 está implementado localmente; no se ha desplegado.
+Monorepo del club: API Express/Prisma, formulario público y panel interno React/Vite. El código de las fases 1A–5 está en `main`; la EC2 todavía sirve placeholders, no esta aplicación.
 
 ## Requisitos
 
@@ -22,3 +22,5 @@ Para ejecutar también la prueba de integración HTTP, configura `DATABASE_URL` 
 La API escucha en `http://localhost:3000/api`, el formulario en `http://localhost:5173` y el panel en `http://localhost:5174/admin/`. Ambos frontends consultan `/api/*` mediante el proxy local de Vite. El panel contiene clientes, canjes, dados, catálogo, zonas, usuarios, dashboard y auditoría.
 
 El schema de Prisma está en `hackaton-backend/prisma/schema.prisma`. Para migración, seed y pruebas de integración hace falta PostgreSQL en un entorno privado; no se han ejecutado aquí por decisión del usuario. `pnpm -r typecheck`, `pnpm lint`, `pnpm test`, `pnpm knip`, `pnpm format:check` y `pnpm build` verifican el código sin usar AWS. Consulta `docs/PROGRESS.md` para resultados y pendientes.
+
+El stack de producción y la validación AWS están en `docs/DEPLOYMENT.md`. El workflow de despliegue es manual y no debe ejecutarse hasta completar sus prerrequisitos.

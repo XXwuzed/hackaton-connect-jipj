@@ -1,0 +1,95 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: club_fidelizacion_postgres_prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?required}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?required}
+      POSTGRES_DB: ${POSTGRES_DB:?required}
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    networks:
+      - internal_net
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  migrate:
+    image: club-enlace-api:local
+    build:
+      context: .
+      dockerfile: hackaton-backend/Dockerfile
+    command:
+      ['pnpm', '--filter', '@club/api', 'exec', 'prisma', 'migrate', 'deploy']
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?required}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - internal_net
+    restart: 'no'
+
+  backend:
+    image: club-enlace-api:local
+    container_name: club_fidelizacion_backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: ${DATABASE_URL:?required}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?required}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?required}
+      CORS_ORIGINS: ${CORS_ORIGINS:?required}
+      CUSTOMER_WEB_URL: ${CUSTOMER_WEB_URL:?required}
+      ADMIN_WEB_URL: ${ADMIN_WEB_URL:?required}
+      CONSENT_VERSION: ${CONSENT_VERSION:?required}
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET:?required}
+      RESEND_API_KEY: ${RESEND_API_KEY:?required}
+      MAIL_FROM: ${MAIL_FROM:?required}
+      RECAPTCHA_SECRET: ${RECAPTCHA_SECRET:?required}
+      RECAPTCHA_BYPASS: 'false'
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    networks:
+      - internal_net
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3000/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+      args:
+        VITE_RECAPTCHA_SITE_KEY: ${VITE_RECAPTCHA_SITE_KEY:?required}
+    container_name: club_fidelizacion_web
+    restart: unless-stopped
+    ports:
+      - '80:80'
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - internal_net
+
+volumes:
+  postgres_prod_data:
+    name: club_fidelizacion_postgres_prod_data
+
+networks:
+  internal_net:
+    driver: bridge
