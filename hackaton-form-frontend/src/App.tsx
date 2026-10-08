@@ -1,4 +1,6 @@
 import { lazy, Suspense } from 'react';
+import { LoadingState } from '@club/ui';
+import { publicMessages } from './messages/public';
 
 const Register = lazy(() => import('./pages/Register'));
 const Unsubscribe = lazy(() => import('./pages/Unsubscribe'));
@@ -13,7 +15,7 @@ export function App(): JSX.Element {
       ? Success
       : Register;
   return (
-    <Suspense fallback={<p className="p-6">Cargando…</p>}>
+    <Suspense fallback={<LoadingState label={publicMessages.loading} />}>
       <Screen />
     </Suspense>
   );

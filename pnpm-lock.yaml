@@ -111,6 +111,9 @@ importers:
       '@club/contracts':
         specifier: workspace:*
         version: link:../packages/contracts
+      '@club/ui':
+        specifier: workspace:*
+        version: link:../packages/ui
       '@tanstack/react-query':
         specifier: ^5.0.0
         version: 5.104.1(react@18.3.1)
@@ -160,6 +163,9 @@ importers:
       '@club/contracts':
         specifier: workspace:*
         version: link:../packages/contracts
+      '@club/ui':
+        specifier: workspace:*
+        version: link:../packages/ui
       react:
         specifier: ^18.0.0
         version: 18.3.1
@@ -194,6 +200,16 @@ importers:
       zod:
         specifier: ^3.0.0
         version: 3.25.76
+
+  packages/ui:
+    dependencies:
+      react:
+        specifier: ^18.0.0
+        version: 18.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^18.0.0
+        version: 18.3.31
 
 packages:
 

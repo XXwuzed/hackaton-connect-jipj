@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { apiRequest } from '../../../lib/api-client';
+import { Icon } from '@club/ui';
 
 interface Product {
   id: string;
@@ -72,8 +73,17 @@ export default function Catalog(): JSX.Element {
       {query.isError && <p role="alert">No se pudo cargar el catálogo.</p>}
       {query.data?.data.map((row) => (
         <article className="flex items-center gap-4 border-b p-3" key={row.id}>
-          {row.imageUrl && (
-            <img alt="" src={row.imageUrl} className="h-16 w-16 object-cover" />
+          {row.imageUrl ? (
+            <img
+              alt=""
+              loading="lazy"
+              src={row.imageUrl}
+              className="h-16 w-16 object-cover"
+            />
+          ) : (
+            <span className="icon-tile icon-tile--yellow">
+              <Icon name="store" />
+            </span>
           )}
           <div className="flex-1">
             <p className="font-bold">{row.name}</p>

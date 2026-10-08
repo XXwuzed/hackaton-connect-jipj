@@ -131,6 +131,7 @@ export default function CreateRedemption(): JSX.Element {
                 <img
                   className="h-12 w-12 object-cover"
                   alt=""
+                  loading="lazy"
                   src={item.product.imageUrl}
                 />
               )}

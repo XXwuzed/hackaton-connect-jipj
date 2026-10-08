@@ -2,6 +2,8 @@ import { useQuery } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../../app/auth-context';
 import { apiRequest } from '../../../lib/api-client';
+import { Icon, LoadingState } from '@club/ui';
+import { customersMessages as copy } from '../../../messages/customers';
 
 interface CustomerRow {
   id: string;
@@ -37,6 +39,7 @@ export default function Customers(): JSX.Element {
   return (
     <section>
       <h1 className="text-2xl font-bold">Clientes</h1>
+      <p>{copy.description}</p>
       <div className="my-4 flex flex-wrap gap-3">
         <input
           aria-label="Buscar cédula, nombre o correo"
@@ -80,13 +83,16 @@ export default function Customers(): JSX.Element {
           </select>
         )}
       </div>
-      {query.isPending && <p>Cargando clientes…</p>}
+      {query.isPending && <LoadingState label={copy.loading} />}
       {query.isError && <p role="alert">No se pudieron cargar los clientes.</p>}
       {query.data && (
         <>
-          <p>{query.data.meta.total} clientes</p>
+          <p className="table-caption">
+            {new Intl.NumberFormat('es-EC').format(query.data.meta.total)}{' '}
+            clientes
+          </p>
           <div className="overflow-x-auto">
-            <table className="mt-3 w-full text-left">
+            <table className="w-full text-left">
               <thead>
                 <tr>
                   <th>Cliente</th>
@@ -100,20 +106,48 @@ export default function Customers(): JSX.Element {
                 {query.data.data.map((item) => (
                   <tr key={item.id} className="border-t">
                     <td className="py-2">
-                      <Link className="underline" to={`/customers/${item.id}`}>
-                        {item.firstName} {item.lastName}
-                      </Link>
+                      <div className="customer-cell">
+                        <span className="user-avatar" aria-hidden="true">
+                          {item.firstName.charAt(0)}
+                          {item.lastName.charAt(0)}
+                        </span>
+                        <Link
+                          className="underline"
+                          to={`/customers/${item.id}`}
+                        >
+                          {item.firstName} {item.lastName}
+                        </Link>
+                      </div>
                     </td>
                     <td>{item.nationalId}</td>
                     <td>{item.email}</td>
-                    <td>{item.pointsBalance}</td>
-                    <td>{item.status}</td>
+                    <td className="font-semibold">
+                      {new Intl.NumberFormat('es-EC').format(
+                        item.pointsBalance,
+                      )}
+                    </td>
+                    <td>
+                      <span
+                        className={`status-badge${item.status !== 'ACTIVE' ? ' status-badge--inactive' : ''}`}
+                      >
+                        {item.status === 'ACTIVE' ? copy.active : copy.inactive}
+                      </span>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            {query.data.data.length === 0 && (
+              <div className="empty-state">
+                <Icon name="search" />
+                <p>{copy.empty}</p>
+              </div>
+            )}
           </div>
-          <div className="mt-4 flex gap-2">
+          <div className="pagination mt-4 flex gap-2">
+            <span>
+              {copy.page} {page}
+            </span>
             <button
               disabled={page <= 1}
               onClick={() => setParam('page', String(page - 1))}

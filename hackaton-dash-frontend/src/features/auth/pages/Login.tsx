@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../app/auth-context';
+import { Brand, ConnectionArt, Icon } from '@club/ui';
+import { authMessages as copy } from '../../../messages/auth';
 
 /** Presenta el formulario de acceso al panel interno. */
 export default function Login(): JSX.Element {
@@ -10,6 +12,7 @@ export default function Login(): JSX.Element {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   if (user)
     return (
       <Navigate
@@ -28,50 +31,110 @@ export default function Login(): JSX.Element {
         replace: true,
       });
     } catch {
-      setError('No se pudo iniciar sesión. Revisa tus credenciales.');
+      setError(copy.error);
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <main className="mx-auto max-w-md px-6 py-16">
-      <h1 className="mb-6 text-2xl font-bold">Ingresar al panel</h1>
-      <form onSubmit={(event) => void submit(event)} className="space-y-4">
-        <label className="block">
-          Correo
-          <input
-            className="mt-1 w-full rounded border p-2"
-            type="email"
-            autoComplete="username"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-          />
-        </label>
-        <label className="block">
-          Contraseña
-          <input
-            className="mt-1 w-full rounded border p-2"
-            type="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-          />
-        </label>
-        {error && (
-          <p role="alert" className="text-red-700">
-            {error}
+    <main className="login-layout">
+      <section className="login-story" aria-labelledby="story-title">
+        <Brand light />
+        <div className="login-story-content">
+          <p className="eyebrow">{copy.eyebrow}</p>
+          <h2 id="story-title">
+            {copy.storyTitle}
+            <br />
+            <span>{copy.storyAccent}</span>
+          </h2>
+          <p>{copy.storyDescription}</p>
+          <ConnectionArt />
+        </div>
+        <p className="login-story-footer">
+          <Icon name="heart" />
+          {copy.storyFooter}
+        </p>
+      </section>
+      <section className="login-form-side" aria-labelledby="login-title">
+        <div className="login-mobile-brand">
+          <Brand />
+        </div>
+        <div className="login-form-card">
+          <span className="icon-tile">
+            <Icon name="lock" />
+          </span>
+          <p className="login-team">{copy.team}</p>
+          <h1 id="login-title">{copy.loginTitle}</h1>
+          <p className="login-description">{copy.loginDescription}</p>
+          <form
+            onSubmit={(event) => void submit(event)}
+            className="form-stack"
+            aria-busy={busy}
+          >
+            <label className="field">
+              {copy.email}
+              <span className="input-with-icon">
+                <Icon name="mail" />
+                <input
+                  name="email"
+                  type="email"
+                  autoComplete="username"
+                  placeholder={copy.emailPlaceholder}
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  required
+                />
+              </span>
+            </label>
+            <div className="field">
+              <label htmlFor="login-password">{copy.password}</label>
+              <div className="input-with-icon">
+                <Icon name="lock" />
+                <input
+                  id="login-password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  placeholder={copy.passwordPlaceholder}
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  required
+                />
+                <button
+                  className="icon-button"
+                  type="button"
+                  aria-label={
+                    showPassword ? copy.hidePassword : copy.showPassword
+                  }
+                  aria-pressed={showPassword}
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  <Icon name={showPassword ? 'eyeOff' : 'eye'} />
+                </button>
+              </div>
+            </div>
+            {error && <p role="alert">{error}</p>}
+            <button
+              className="button button--primary button--full"
+              type="submit"
+              disabled={busy}
+            >
+              {busy ? copy.busy : copy.submit}
+              <Icon name="arrow" />
+            </button>
+          </form>
+          <div className="login-help">
+            <strong>{copy.helpTitle}</strong>
+            <p>{copy.helpDescription}</p>
+          </div>
+          <p className="quiet-note">
+            <Icon name="shield" />
+            {copy.sessionNote}
           </p>
-        )}
-        <button
-          className="rounded bg-primary px-4 py-2 text-white disabled:opacity-50"
-          disabled={busy}
-        >
-          {busy ? 'Ingresando…' : 'Ingresar'}
-        </button>
-      </form>
+        </div>
+        <footer className="login-footer">{copy.footer}</footer>
+      </section>
     </main>
   );
 }

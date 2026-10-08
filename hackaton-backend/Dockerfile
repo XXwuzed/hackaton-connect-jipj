@@ -9,6 +9,7 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY tsconfig.base.json ./
 COPY packages/contracts/package.json packages/contracts/package.json
+COPY packages/ui/package.json packages/ui/package.json
 COPY hackaton-backend/package.json hackaton-backend/package.json
 COPY hackaton-form-frontend/package.json hackaton-form-frontend/package.json
 COPY hackaton-dash-frontend/package.json hackaton-dash-frontend/package.json
