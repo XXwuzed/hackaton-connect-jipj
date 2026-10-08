@@ -29,8 +29,8 @@ export const dashboardMessages = {
   catalogDescription: 'Revisa los productos que forman parte del club.',
   rotation: 'Decisiones con información',
   rotationDescription: 'Explora la rotación y el margen de los productos.',
-  redemption: 'Un nuevo beneficio',
+  redemption: 'Registrar canje',
   redemptionDescription: 'Acompaña a un cliente a canjear sus puntos.',
-  dice: 'Un momento de suerte',
+  dice: 'Registrar dados',
   diceDescription: 'Registra el resultado de los dados en tienda.',
 };
