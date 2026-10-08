@@ -1,0 +1,363 @@
+// Farmaenlace Loyalty - borrador para revisión
+// Reglas: dinero = Decimal, instantes = timestamptz (con @db.Timestamptz), cortes de día en America/Guayaquil (en código)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ───────────── ENUMS ─────────────
+
+enum Role {
+  ADMIN
+  ADVISOR
+}
+
+enum CustomerStatus {
+  ACTIVE
+  UNSUBSCRIBED
+}
+
+// ───────────── ORGANIZACIÓN Y USUARIOS ─────────────
+
+model Company {
+  id        String   @id @default(uuid())
+  name      String   @unique // Wellderma, Ambiente, Medicity, Económicas, Mascotas
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  users          User[]
+  stores         Store[]
+  products       Product[]
+  redemptions    Redemption[]
+  diceRolls      DiceRoll[]
+}
+
+model User {
+  id                 String    @id @default(uuid())
+  email              String    @unique
+  passwordHash       String
+  firstName          String
+  lastName           String
+  role               Role
+  companyId          String?   // null = ADMIN global; ADVISOR siempre con empresa (validar en service)
+  zoneId             String?   // ADVISOR: una sola zona; ADMIN: null
+  storeId            String?   // ADVISOR: tienda donde trabaja; ADMIN: null
+  active             Boolean   @default(true)
+  mustChangePassword Boolean   @default(true)
+  lastLoginAt        DateTime? @db.Timestamptz(3)
+  createdAt          DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime  @updatedAt @db.Timestamptz(3)
+
+  company               Company?     @relation(fields: [companyId], references: [id])
+  zone                  Zone?        @relation(fields: [zoneId], references: [id])
+  store                 Store?       @relation(fields: [storeId], references: [id])
+  registeredRedemptions Redemption[]
+  registeredDiceRolls   DiceRoll[]
+  auditLogs             AuditLog[]
+
+  @@index([companyId])
+  @@index([zoneId])
+  @@index([storeId])
+}
+
+model Zone {
+  id           String    @id @default(uuid())
+  name         String    @unique // Puembo, Tumbaco, Cumbayá
+  centerLat    Decimal   @db.Decimal(9, 6)
+  centerLng    Decimal   @db.Decimal(9, 6)
+  radiusMeters Int
+  active       Boolean   @default(true)
+  deletedAt    DateTime? @db.Timestamptz(3) // eliminar = soft delete
+  createdAt    DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime  @updatedAt @db.Timestamptz(3)
+
+  users      User[]
+  stores     Store[]
+  customers  Customer[]
+  products   RedeemableProductZone[]
+  dicePrizes DicePrizeZone[]
+}
+
+// Tienda física. Su código va en el QR: /?t=<code>
+model Store {
+  id        String   @id @default(uuid())
+  code      String   @unique
+  name      String
+  companyId String
+  zoneId    String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  company     Company      @relation(fields: [companyId], references: [id])
+  zone        Zone         @relation(fields: [zoneId], references: [id])
+  customers   Customer[]
+  redemptions Redemption[]
+  diceRolls   DiceRoll[]
+  users       User[]
+
+  @@index([zoneId])
+  @@index([companyId])
+}
+
+// ───────────── CLIENTES ─────────────
+
+model Customer {
+  id               String         @id @default(uuid())
+  nationalId       String         @unique @db.VarChar(10) // cédula; CHECK de 10 dígitos en migración
+  firstName        String
+  lastName         String
+  email            String
+  phone            String?        // opcional: hay clientes sin celular
+  status           CustomerStatus @default(ACTIVE)
+  unsubscribeToken String         @unique @default(uuid()) // va en el enlace del correo de bienvenida
+  registeredStoreId String        // tienda del QR con la que se inscribió
+  zoneId           String         // copia de la zona de la tienda al inscribirse (no se reasigna sola)
+  consentAt        DateTime       @db.Timestamptz(3) // consentimiento LOPDP
+  consentVersion   String         // versión de la política aceptada
+  unsubscribedAt   DateTime?      @db.Timestamptz(3)
+  createdAt        DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime       @updatedAt @db.Timestamptz(3)
+
+  registeredStore Store         @relation(fields: [registeredStoreId], references: [id])
+  zone         Zone             @relation(fields: [zoneId], references: [id])
+  pointsLots   PointsLot[]
+  redemptions  Redemption[]
+  diceRoll     DiceRoll?        // una sola tirada de por vida
+
+  @@index([email])
+  @@index([lastName, firstName])
+  @@index([zoneId])
+  @@index([registeredStoreId])
+  @@index([createdAt])
+}
+
+// ───────────── PUNTOS ─────────────
+// Los puntos ya vienen calculados; se insertan directo en la base de datos.
+
+// Cada adquisición de puntos = un lote con su propio vencimiento
+model PointsLot {
+  id              String   @id @default(uuid())
+  customerId      String
+  pointsEarned    Int
+  pointsRemaining Int      // CHECK >= 0 y <= pointsEarned en migración
+  earnedAt        DateTime @db.Timestamptz(3) // fecha en que se adquirieron
+  expiresAt       DateTime @db.Timestamptz(3) // earnedAt + 1 año, fin del día Guayaquil
+
+  customer Customer         @relation(fields: [customerId], references: [id])
+  usages   PointsLotUsage[]
+
+  @@index([customerId, expiresAt])
+}
+
+// De qué lote salieron los puntos de cada canje (solo inserciones)
+model PointsLotUsage {
+  id           String   @id @default(uuid())
+  redemptionId String
+  lotId        String
+  points       Int      // positivo: puntos consumidos de ese lote
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+
+  redemption Redemption @relation(fields: [redemptionId], references: [id])
+  lot        PointsLot  @relation(fields: [lotId], references: [id])
+
+  @@index([redemptionId])
+  @@index([lotId])
+}
+
+// Ajuste visual editable por el admin: 1 USD = X puntos. No participa en ningún cálculo.
+// Una sola fila (id = 1), sin historial.
+model LoyaltySettings {
+  id              Int      @id @default(1)
+  pointsPerDollar Int      @default(5)
+  updatedAt       DateTime @updatedAt @db.Timestamptz(3)
+  updatedById     String?
+}
+
+// ───────────── CATÁLOGO Y PRODUCTOS CANJEABLES ─────────────
+
+model Product {
+  id          String   @id @default(uuid())
+  sku         String   @unique
+  name        String
+  description String?
+  imageKey    String?  // clave del objeto en S3 (no la URL completa)
+  pvp         Decimal  @db.Decimal(10, 2)
+  companyId   String
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
+
+  company          Company           @relation(fields: [companyId], references: [id])
+  redeemable       RedeemableProduct?
+  dicePrize        DicePrize?
+  salesSummary     ProductSalesSummary?
+  redemptions      Redemption[]
+  diceAsPurchased  DiceRollPurchasedItem[]
+  diceAsPrize      DiceRoll[]        @relation("DicePrizeProduct")
+
+  @@index([companyId])
+  @@index([name])
+}
+
+// Resumen de ventas por producto, solo para analítica del admin (sin tienda ni zona)
+model ProductSalesSummary {
+  productId String   @id
+  unitsSold Int
+  margin    Decimal  @db.Decimal(5, 2) // porcentaje, ej. 32.50 = 32,5%; CHECK entre -100 y 100 en migración
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  product Product @relation(fields: [productId], references: [id])
+
+  @@index([margin])
+  @@index([unitsSold])
+}
+
+// Qué productos del catálogo se pueden canjear y a cuántos puntos
+model RedeemableProduct {
+  id              String   @id @default(uuid())
+  productId       String   @unique
+  pointsRequired  Int
+  discountPercent Decimal? @db.Decimal(5, 2) // null = sin descuento
+  active          Boolean  @default(true)      // false = sigue en catálogo, no se ofrece
+  updatedAt       DateTime @updatedAt @db.Timestamptz(3)
+
+  product Product                 @relation(fields: [productId], references: [id])
+  zones   RedeemableProductZone[]
+}
+
+model RedeemableProductZone {
+  redeemableProductId String
+  zoneId              String
+
+  redeemableProduct RedeemableProduct @relation(fields: [redeemableProductId], references: [id], onDelete: Cascade)
+  zone              Zone              @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+
+  @@id([redeemableProductId, zoneId])
+  @@index([zoneId])
+}
+
+// ───────────── CANJES ─────────────
+
+// Un registro = un producto canjeado
+model Redemption {
+  id            String           @id @default(uuid())
+  customerId    String
+  productId     String
+  advisorId     String
+  companyId     String
+  storeId       String           // tienda donde se registró el canje
+  pointsCost    Int              // snapshot al momento del canje
+  productName   String           // snapshot
+  redeemedAt    DateTime         @default(now()) @db.Timestamptz(3)
+  redeemedDate  DateTime         @db.Date // día en Guayaquil, para regla de 2/día
+
+  customer  Customer         @relation(fields: [customerId], references: [id])
+  product   Product          @relation(fields: [productId], references: [id])
+  advisor   User             @relation(fields: [advisorId], references: [id])
+  company   Company          @relation(fields: [companyId], references: [id])
+  store     Store            @relation(fields: [storeId], references: [id])
+  lotUsages PointsLotUsage[]
+
+  @@index([storeId, redeemedAt])
+  @@index([customerId, redeemedDate])
+  @@index([customerId, productId, redeemedAt])
+  @@index([companyId, redeemedAt])
+  @@index([redeemedAt])
+  @@index([advisorId])
+  @@index([productId])
+}
+
+// ───────────── DADOS ─────────────
+
+// Productos que se ofrecen como premio
+model DicePrize {
+  id        String   @id @default(uuid())
+  productId String   @unique
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  product Product        @relation(fields: [productId], references: [id])
+  zones   DicePrizeZone[]
+}
+
+model DicePrizeZone {
+  dicePrizeId String
+  zoneId      String
+
+  dicePrize DicePrize @relation(fields: [dicePrizeId], references: [id], onDelete: Cascade)
+  zone      Zone      @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+
+  @@id([dicePrizeId, zoneId])
+  @@index([zoneId])
+}
+
+// Una tirada por cliente de por vida (customerId @unique)
+model DiceRoll {
+  id                 String   @id @default(uuid())
+  customerId         String   @unique
+  advisorId          String
+  companyId          String
+  storeId            String   // tienda donde se registró la tirada
+  die1               Int      // CHECK 1..6 en migración
+  die2               Int      // CHECK 1..6 en migración
+  isWinner           Boolean  // die1 = 6 AND die2 = 6 (calculado en service)
+  purchaseAmount     Decimal  @db.Decimal(10, 2) // ingresado por el asesor; service exige > 10
+  prizeProductId     String?  // obligatorio si isWinner (validar en service)
+  createdAt          DateTime @default(now()) @db.Timestamptz(3)
+
+  customer         Customer @relation(fields: [customerId], references: [id])
+  advisor          User     @relation(fields: [advisorId], references: [id])
+  company          Company  @relation(fields: [companyId], references: [id])
+  store            Store    @relation(fields: [storeId], references: [id])
+  prizeProduct     Product? @relation("DicePrizeProduct", fields: [prizeProductId], references: [id])
+  purchasedItems   DiceRollPurchasedItem[]
+
+  @@index([companyId, createdAt])
+  @@index([isWinner, createdAt])
+  @@index([advisorId])
+  @@index([storeId])
+  @@index([prizeProductId])
+}
+
+// Uno o varios productos comprados para habilitar la tirada
+model DiceRollPurchasedItem {
+  diceRollId String
+  productId  String
+  quantity   Int    @default(1)
+
+  diceRoll DiceRoll @relation(fields: [diceRollId], references: [id], onDelete: Cascade)
+  product  Product  @relation(fields: [productId], references: [id])
+
+  @@id([diceRollId, productId])
+  @@index([productId])
+}
+
+// ───────────── AUDITORÍA ─────────────
+
+// Solo inserciones. Revocar UPDATE/DELETE al usuario de la app en la BD.
+model AuditLog {
+  id         String   @id @default(uuid())
+  actorId    String?  // null en acciones públicas (inscripción)
+  actorRole  Role?
+  action     String   // "redemption.create", "product.update", "user.create"...
+  entityType String
+  entityId   String?
+  before     Json?
+  after      Json?
+  ip         String?
+  userAgent  String?
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+
+  actor User? @relation(fields: [actorId], references: [id])
+
+  @@index([actorId, createdAt])
+  @@index([entityType, entityId])
+  @@index([action, createdAt])
+  @@index([createdAt])
+}

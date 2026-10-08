@@ -1,0 +1,17 @@
+{
+  "synthetic": true,
+  "redeemables": [
+    {
+      "sku": "DEMO-001",
+      "pointsRequired": 15,
+      "discountPercent": null,
+      "zoneNames": ["Zona Demo Sintética"]
+    },
+    {
+      "sku": "DEMO-002",
+      "pointsRequired": 25,
+      "discountPercent": 5,
+      "zoneNames": ["Zona Demo Sintética"]
+    }
+  ]
+}

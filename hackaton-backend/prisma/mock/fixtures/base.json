@@ -1,0 +1,37 @@
+{
+  "synthetic": true,
+  "company": { "name": "Empresa Demo Sintética" },
+  "zone": {
+    "name": "Zona Demo Sintética",
+    "centerLat": -0.180653,
+    "centerLng": -78.467834,
+    "radiusMeters": 1000
+  },
+  "store": { "code": "DEMO001", "name": "Tienda Demo Sintética" },
+  "users": {
+    "admin": {
+      "email": "admin@example.com",
+      "firstName": "Admin",
+      "lastName": "Demo"
+    },
+    "advisor": {
+      "email": "advisor@example.com",
+      "firstName": "Asesor",
+      "lastName": "Demo"
+    }
+  },
+  "products": [
+    {
+      "sku": "DEMO-001",
+      "name": "Producto Demo 1",
+      "description": "Dato sintético",
+      "pvp": "5.00"
+    },
+    {
+      "sku": "DEMO-002",
+      "name": "Producto Demo 2",
+      "description": "Dato sintético",
+      "pvp": "8.50"
+    }
+  ]
+}

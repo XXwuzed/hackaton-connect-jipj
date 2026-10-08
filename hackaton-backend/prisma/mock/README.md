@@ -1,0 +1,12 @@
+# Datos mock (solo desarrollo/pruebas)
+
+Los comandos leen primero `prisma/mock/data/<nombre>.json`, luego `.csv`; si no existe ninguno, usan un fixture de `fixtures/` marcado `synthetic: true`. No se ejecutan en producción. Requieren seed base y PostgreSQL. Los cargadores validan con Zod y señalan filas inválidas; se pueden repetir sin duplicar por su clave natural.
+
+| Comando                    | JSON: lista                                                                                                      | CSV: columnas                                                                                                 | Clave                     |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| `pnpm db:mock:customers`   | `customers` con `nationalId,firstName,lastName,email,storeCode,status,lots[{points,earnedAt? / earnedDaysAgo?}]` | `nationalId,firstName,lastName,email,storeCode,status,points,earnedAt` (o `earnedDaysAgo`); una fila por lote | Cédula; lote por posición |
+| `pnpm db:mock:redeemables` | `redeemables` con `sku,pointsRequired,discountPercent,zoneNames[]`                                               | `sku,pointsRequired,discountPercent,zoneNames`                                                                | SKU                       |
+| `pnpm db:mock:prizes`      | `prizes` con `sku,zoneNames[]`                                                                                   | `sku,zoneNames`                                                                                               | SKU                       |
+| `pnpm db:mock:sales`       | `sales` con `sku,unitsSold,margin`                                                                               | mismas columnas                                                                                               | SKU                       |
+
+En CSV, `zoneNames` separa varios nombres con `|`. `discountPercent` vacío significa sin descuento. `earnedAt` usa ISO UTC. Todos los datos entregados deben ser sintéticos; no guardar datos personales reales ni contraseñas en estos archivos. Los lotes calculan `expiresAt` con la regla de un año y fin del día de Guayaquil.

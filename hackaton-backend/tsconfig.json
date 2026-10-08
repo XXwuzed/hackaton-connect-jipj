@@ -1,0 +1,15 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2022"],
+    "types": ["node"],
+    "baseUrl": "."
+  },
+  "include": [
+    "src",
+    "test",
+    "prisma/seed.ts",
+    "tsup.config.ts",
+    "vitest.config.ts"
+  ]
+}

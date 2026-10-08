@@ -1,0 +1,7 @@
+{
+  "synthetic": true,
+  "sales": [
+    { "sku": "DEMO-001", "unitsSold": 12, "margin": 32.5 },
+    { "sku": "DEMO-002", "unitsSold": 2, "margin": 55.0 }
+  ]
+}
