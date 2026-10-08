@@ -24,3 +24,12 @@ La API escucha en `http://localhost:3000/api`, el formulario en `http://localhos
 El schema de Prisma está en `hackaton-backend/prisma/schema.prisma`. Para migración, seed y pruebas de integración hace falta PostgreSQL en un entorno privado; no se han ejecutado aquí por decisión del usuario. `pnpm -r typecheck`, `pnpm lint`, `pnpm test`, `pnpm knip`, `pnpm format:check` y `pnpm build` verifican el código sin usar AWS. Consulta `docs/PROGRESS.md` para resultados y pendientes.
 
 El stack de producción y la validación AWS están en `docs/DEPLOYMENT.md`. El workflow de despliegue es manual y no debe ejecutarse hasta completar sus prerrequisitos.
+
+## Credenciales de prueba
+
+Datos sintéticos del hackatón (`pnpm db:seed:all`), iguales en local y producción:
+
+| Rol           | Correo                   | Contraseña   |
+| ------------- | ------------------------ | ------------ |
+| Administrador | `admin@farmaenlace.com`  | `Admin123!`  |
+| Asesor        | `asesor@farmaenlace.com` | `Asesor123!` |
