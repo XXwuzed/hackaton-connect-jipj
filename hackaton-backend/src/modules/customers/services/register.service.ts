@@ -1,14 +1,9 @@
 import type { PrismaClient } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 import type { Config } from '../../../shared/config';
-import {
-  ConflictError,
-  NotFoundError,
-  ValidationError,
-} from '../../../shared/errors';
+import { ConflictError, NotFoundError } from '../../../shared/errors';
 import type { Mailer } from '../../../shared/mailer';
 import { logger } from '../../../shared/logger';
-import { verifyRecaptcha } from '../../../shared/recaptcha';
 import { log } from '../../audit';
 import type { RegisterInput } from '../customers.dto';
 import type { RequestContext } from '../../auth/auth.types';
@@ -21,9 +16,6 @@ export async function registerCustomer(
   input: RegisterInput,
   context: RequestContext,
 ) {
-  if (!(await verifyRecaptcha(input.recaptchaToken, 'register', config))) {
-    throw new ValidationError('Verificación anti-robots fallida');
-  }
   const store = await prisma.store.findUnique({
     where: { code: input.storeCode },
     select: {
@@ -98,8 +90,8 @@ export async function registerCustomer(
     const url = `${config.CUSTOMER_WEB_URL.replace(/\/$/, '')}/baja/${customer.unsubscribeToken}`;
     await mailer.send(
       customer.email,
-      'Bienvenido al club',
-      `<p>Bienvenido al club.</p><p>Si deseas darte de baja, visita <a href="${url}">este enlace</a>.</p>`,
+      'Bienvenido a EnlaceHermano',
+      `<p>Bienvenido a EnlaceHermano.</p><p>Si deseas darte de baja, visita <a href="${url}">este enlace</a>.</p>`,
     );
   } catch (error) {
     logger.error(

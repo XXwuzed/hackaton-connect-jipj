@@ -12,7 +12,7 @@ Todas las rutas externas tienen prefijo `/api`. Las mutaciones requieren `X-Requ
 | POST   | `/api/auth/change-password`                 | Verifica contraseña actual, cambia hash argon2id y audita                | Cookie access; permite cambio obligatorio           | 1B   |
 | POST   | `/api/uploads/presign`                      | URL temporal de subida para jpeg/png/webp bajo `products/`               | ADMIN con `catalog:update`; requiere S3 configurado | 1B   |
 | GET    | `/api/public/stores/:code`                  | Nombre de tienda y empresa                                               | Público                                             | 2    |
-| POST   | `/api/public/customers`                     | Inscripción con consentimiento y reCAPTCHA                               | Público; 10/h por IP                                | 2    |
+| POST   | `/api/public/customers`                     | Inscripción con consentimiento                                           | Público; 10/h por IP                                | 2    |
 | GET    | `/api/public/unsubscribe/:token`            | Nombre enmascarado y estado, sin efectos                                 | Público                                             | 2    |
 | POST   | `/api/public/unsubscribe/:token`            | Baja idempotente                                                         | Público                                             | 2    |
 | GET    | `/api/customers`                            | Búsqueda, filtros, saldo, `scope`, paginación                            | ADMIN/ADVISOR                                       | 2    |

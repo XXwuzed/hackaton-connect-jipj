@@ -1,7 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { isValidNationalId } from '@club/contracts';
 import { getStore, registerCustomer } from '../lib/api';
-import { getRecaptchaToken } from '../lib/recaptcha';
 
 /** Inscribe desde el QR de una tienda, sin crear una cuenta del cliente. */
 export default function Register(): JSX.Element {
@@ -38,7 +37,6 @@ export default function Register(): JSX.Element {
     setBusy(true);
     setError('');
     try {
-      const recaptchaToken = await getRecaptchaToken();
       await registerCustomer({
         nationalId,
         firstName,
@@ -47,7 +45,6 @@ export default function Register(): JSX.Element {
         phone: phone || undefined,
         consent: true,
         storeCode,
-        recaptchaToken,
       });
       window.location.assign('/success');
     } catch {
@@ -60,7 +57,7 @@ export default function Register(): JSX.Element {
   }
   return (
     <main className="mx-auto max-w-md p-6">
-      <h1 className="text-2xl font-bold text-primary">Club Farmaenlace</h1>
+      <h1 className="text-2xl font-bold text-primary">EnlaceHermano</h1>
       <p className="mt-2">
         Registro gratuito para la demostración con datos sintéticos.
       </p>

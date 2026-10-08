@@ -3,7 +3,7 @@
 ## Clientes
 
 - Cédula ecuatoriana de 10 dígitos y checksum módulo 10; RUC rechazado: `packages/contracts/src/national-id.ts`. La unicidad de `nationalId` incluye bajas: `customers/services/register.service.ts`.
-- Registro público exige consentimiento, tienda activa y reCAPTCHA; copia la zona de la tienda, registra `CONSENT_VERSION` y audita en la misma transacción. Resend se invoca después del commit y su fallo no revierte: `customers/services/register.service.ts`.
+- Registro público exige consentimiento y tienda activa; copia la zona de la tienda, registra `CONSENT_VERSION` y audita en la misma transacción. Resend se invoca después del commit y su fallo no revierte: `customers/services/register.service.ts`.
 - Baja: GET informativo sin efecto y POST idempotente con `status=UNSUBSCRIBED`; queda auditado: `customers/services/unsubscribe.service.ts`.
 - El asesor ve por defecto clientes de su zona, pero `scope=all` amplía la búsqueda: `customers/services/list.service.ts`. Puede canjear y registrar dados a cualquier cliente activo.
 

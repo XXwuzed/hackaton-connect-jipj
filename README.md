@@ -1,6 +1,6 @@
-# Club de Fidelización Farmaenlace
+# EnlaceHermano
 
-Monorepo del club: API Express/Prisma, formulario público y panel interno React/Vite. El código de las fases 1A–5 está en `main`; la EC2 todavía sirve placeholders, no esta aplicación.
+Programa de fidelización de Farmaenlace: API Express/Prisma, formulario público y panel interno React/Vite. El código de las fases 1A–5 está en `main`; la EC2 todavía sirve placeholders, no esta aplicación.
 
 ## Requisitos
 
@@ -9,7 +9,7 @@ Monorepo del club: API Express/Prisma, formulario público y panel interno React
 
 ## Inicio
 
-1. Copia los archivos `.env.example` a `.env` en la raíz y en cada aplicación. Completa las variables con valores de desarrollo propios. Nunca subas esos archivos.
+1. Copia `.env.example` a `.env` en la raíz y en `hackaton-backend/`. Completa las variables con valores de desarrollo propios. Los frontends no necesitan `.env` para funcionar. Nunca subas esos archivos.
 2. Ejecuta `pnpm install`.
 3. Ejecuta `pnpm db:up`. Crea además la base de pruebas con `docker compose exec postgres psql -U club -d postgres -c 'CREATE DATABASE club_test'` (ajusta el usuario si cambiaste `POSTGRES_USER`). Si ya existe, omite este paso.
 4. Con el schema de Prisma en `hackaton-backend/prisma/schema.prisma`, ejecuta `pnpm db:migrate`.

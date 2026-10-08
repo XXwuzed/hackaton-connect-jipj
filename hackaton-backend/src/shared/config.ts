@@ -18,10 +18,6 @@ const schema = z
     AWS_SESSION_TOKEN: z.string().min(1).optional(),
     RESEND_API_KEY: z.string().min(1).optional(),
     MAIL_FROM: z.string().email().optional(),
-    RECAPTCHA_SECRET: z.string().min(1).optional(),
-    RECAPTCHA_BYPASS: z
-      .enum(['true', 'false'])
-      .transform((value) => value === 'true'),
   })
   .superRefine((value, context) => {
     if (value.NODE_ENV === 'production') {
@@ -58,13 +54,6 @@ const schema = z
         path: ['AWS_ACCESS_KEY_ID'],
         message:
           'AWS_ACCESS_KEY_ID y AWS_SECRET_ACCESS_KEY deben configurarse juntos',
-      });
-    }
-    if (value.NODE_ENV === 'production' && value.RECAPTCHA_BYPASS) {
-      context.addIssue({
-        code: 'custom',
-        path: ['RECAPTCHA_BYPASS'],
-        message: 'No se permite en producción',
       });
     }
   });

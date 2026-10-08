@@ -15,7 +15,6 @@ export const registerSchema = z
     phone: z.string().trim().min(7).max(20).optional(),
     consent: z.literal(true),
     storeCode: z.string().trim().min(1),
-    recaptchaToken: z.string(),
   })
   .strict();
 

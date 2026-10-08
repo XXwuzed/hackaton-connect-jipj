@@ -1,4 +1,4 @@
-name: Verificar monorepo
+name: Verificar EnlaceHermano
 
 on:
   push:
@@ -50,6 +50,6 @@ jobs:
       - run: pnpm -r --if-present test
       - run: bash -n scripts/deploy.sh
       - run: docker compose --env-file .env.production.example -f docker-compose.prod.yml config --quiet
-      - run: docker build -t club-enlace-api:ci -f hackaton-backend/Dockerfile .
-      - run: docker build --build-arg VITE_RECAPTCHA_SITE_KEY=ci-public-key -t club-enlace-web:ci -f docker/nginx/Dockerfile .
-      - run: docker run --rm --add-host backend:127.0.0.1 club-enlace-web:ci nginx -t
+      - run: docker build -t enlace-hermano-api:ci -f hackaton-backend/Dockerfile .
+      - run: docker build -t enlace-hermano-web:ci -f docker/nginx/Dockerfile .
+      - run: docker run --rm --add-host backend:127.0.0.1 enlace-hermano-web:ci nginx -t

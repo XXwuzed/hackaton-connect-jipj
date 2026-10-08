@@ -1,4 +1,4 @@
-# Despliegue y validación AWS
+# EnlaceHermano · Despliegue y validación AWS
 
 Estado comprobado el 2026-10-08: `main` contiene la app de Fases 1A–5, pero la EC2 sigue sirviendo HTML placeholder y una API stub desde el checkout `dev`. Este documento y los archivos de producción preparan un despliegue **manual**; publicar en GitHub no despliega la app.
 
@@ -22,7 +22,7 @@ Estado comprobado el 2026-10-08: `main` contiene la app de Fases 1A–5, pero la
 1. Revisar los resultados de CI y las 14 pruebas de integración. No asumir que pasaron sólo porque el workflow existe.
 2. Respaldar el volumen PostgreSQL y ensayar restauración. No se hizo durante esta validación.
 3. Actualizar **privadamente** `/opt/hackaton/.env`, sin reemplazar `POSTGRES_USER`, `POSTGRES_PASSWORD` ni `POSTGRES_DB` actuales. Usar `.env.production.example` como lista de nombres, no copiar sus placeholders. `DATABASE_URL` debe apuntar a `postgres:5432/farmaenlace_prod` y codificar caracteres especiales de la contraseña.
-4. Configurar dos secretos JWT distintos de 32+ caracteres, `CONSENT_VERSION` aprobado, URLs CloudFront, bucket, Resend y reCAPTCHA reales. Dejar `RECAPTCHA_BYPASS=false`. No introducir claves AWS en el `.env` de EC2.
+4. Configurar dos secretos JWT distintos de 32+ caracteres, `CONSENT_VERSION` aprobado, URLs CloudFront, bucket y Resend. No introducir claves AWS en el `.env` de EC2.
 5. Verificar que el usuario/rol de GitHub para SSM tenga permisos mínimos. El workflow usa las credenciales temporales ya configuradas en GitHub; expiran. La cuenta aún no tiene proveedor OIDC de GitHub, que es el reemplazo recomendado antes de automatizar.
 6. Resolver HTTP del origen y autenticación de origen antes de usar datos reales. Este sandbox permite únicamente datos sintéticos.
 
@@ -30,4 +30,4 @@ El `.env` de la EC2 todavía contiene nombres antiguos (`JWT_SECRET`, `CORS_ORIG
 
 ## Comprobación posterior
 
-Tras un despliegue manual autorizado, `/api/health` debe devolver exactamente `{"status":"ok"}`; la API placeholder actual devuelve además `app` y `timestamp`. Confirmar que `/` carga el formulario real y `/admin/` el panel real en sus dominios, que los tres contenedores estén saludables y que S3, Resend y reCAPTCHA funcionen con credenciales de producción. El simple HTTP 200 del stub no valida la aplicación.
+Tras un despliegue manual autorizado, `/api/health` debe devolver exactamente `{"status":"ok"}`; la API placeholder actual devuelve además `app` y `timestamp`. Confirmar que `/` carga el formulario real y `/admin/` el panel real en sus dominios, que los tres contenedores estén saludables y que S3 y Resend funcionen con credenciales de producción. El simple HTTP 200 del stub no valida la aplicación.

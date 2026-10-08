@@ -7,6 +7,7 @@ RUN corepack enable && corepack prepare pnpm@10.0.0 --activate
 
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY tsconfig.base.json ./
 COPY packages/contracts/package.json packages/contracts/package.json
 COPY hackaton-backend/package.json hackaton-backend/package.json
 COPY hackaton-form-frontend/package.json hackaton-form-frontend/package.json

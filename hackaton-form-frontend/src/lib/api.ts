@@ -30,7 +30,6 @@ interface Registration {
   phone?: string;
   consent: true;
   storeCode: string;
-  recaptchaToken: string;
 }
 
 /** Envía una inscripción pública. */

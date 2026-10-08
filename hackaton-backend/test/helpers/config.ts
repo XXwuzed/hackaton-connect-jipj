@@ -17,8 +17,6 @@ export const testEnvironment: NodeJS.ProcessEnv = {
   AWS_SECRET_ACCESS_KEY: 'local-placeholder',
   RESEND_API_KEY: 'local-placeholder',
   MAIL_FROM: 'test@example.com',
-  RECAPTCHA_SECRET: 'local-placeholder',
-  RECAPTCHA_BYPASS: 'true',
 };
 
 export const testConfig = loadConfig(testEnvironment);

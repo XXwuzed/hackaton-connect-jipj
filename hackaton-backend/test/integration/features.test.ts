@@ -231,7 +231,6 @@ describe.skipIf(process.env.RUN_DB_TESTS !== '1')(
         email: `signup-${marker}@example.com`,
         consent: true,
         storeCode: `TEST-${marker}`,
-        recaptchaToken: 'bypass',
       };
       expect(
         (await post('/public/customers').send({ ...body, nationalId: '123' }))

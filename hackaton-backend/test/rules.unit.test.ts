@@ -4,6 +4,7 @@ import { createRedemptionSchema } from '../src/modules/redemptions/redemptions.d
 import { createRollSchema } from '../src/modules/dice/dice.dto';
 import { updateProductSchema } from '../src/modules/products/products.dto';
 import { createUserSchema } from '../src/modules/users/users.dto';
+import { registerSchema } from '../src/modules/customers/customers.dto';
 import { dateSchema } from '../src/shared/queries';
 import { startOfMonthGuayaquil, endOfMonthGuayaquil } from '../src/shared/time';
 
@@ -14,6 +15,20 @@ describe('reglas sin base de datos', () => {
     expect(nationalIdSchema.safeParse('2451234568').success).toBe(false);
     expect(nationalIdSchema.safeParse('2451234567001').success).toBe(false);
     expect(nationalIdSchema.safeParse('9951234567').success).toBe(false);
+  });
+  it('acepta inscripción con consentimiento y sin token externo', () => {
+    const input = {
+      nationalId: '2451234567',
+      firstName: 'Synthetic',
+      lastName: 'Customer',
+      email: 'synthetic@example.com',
+      consent: true,
+      storeCode: 'TEST-STORE',
+    };
+    expect(registerSchema.safeParse(input).success).toBe(true);
+    expect(registerSchema.safeParse({ ...input, consent: false }).success).toBe(
+      false,
+    );
   });
   it('restringe cada solicitud de canje a 1–2 productos', () => {
     expect(

@@ -26,7 +26,7 @@ export default function Dashboard(): JSX.Element {
     );
   return (
     <section>
-      <h1 className="text-2xl font-bold">Resumen del club</h1>
+      <h1 className="text-2xl font-bold">Resumen de EnlaceHermano</h1>
       <label className="my-4 block">
         Mes{' '}
         <input

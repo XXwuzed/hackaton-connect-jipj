@@ -1,4 +1,4 @@
-// Farmaenlace Loyalty - borrador para revisión
+// EnlaceHermano - esquema de fidelización
 // Reglas: dinero = Decimal, instantes = timestamptz (con @db.Timestamptz), cortes de día en America/Guayaquil (en código)
 
 generator client {

@@ -9,9 +9,13 @@ describe('startup configuration', () => {
     ).toThrow(/JWT_ACCESS_SECRET/);
   });
 
-  it('rejects a reCAPTCHA bypass in production', () => {
+  it('rejects short JWT secrets in production', () => {
     expect(() =>
-      loadConfig({ ...testEnvironment, NODE_ENV: 'production' }),
-    ).toThrow(/RECAPTCHA_BYPASS/);
+      loadConfig({
+        ...testEnvironment,
+        NODE_ENV: 'production',
+        CONSENT_VERSION: 'approved-v1',
+      }),
+    ).toThrow(/JWT_ACCESS_SECRET/);
   });
 });

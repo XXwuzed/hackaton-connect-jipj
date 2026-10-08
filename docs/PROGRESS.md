@@ -31,17 +31,17 @@
 - Seed idempotente con empresa, zona, tienda, ADMIN, ADVISOR y dos productos del fixture etiquetado como sintético. Contraseñas solo desde variables de entorno. No se cambió `schema.prisma`.
 - Panel en `/admin/` con login, cambio obligatorio, guard de rutas y menú diferenciado por rol. Funciones de clientes, canjes, dados y dashboard todavía no existen.
 - `pnpm -r typecheck`, `pnpm lint`, `pnpm knip`, `pnpm build` y `pnpm format:check` pasaron. `pnpm test`: 12 pruebas pasaron y 7 de integración quedaron omitidas por falta de `club_test` PostgreSQL.
-- Pendiente antes de marcar 1B como completada: aplicar la migración en una base `club_test`, ejecutar `RUN_DB_TESTS=1 pnpm test`, ejecutar el seed y verificar el flujo de login. El usuario eligió dejar estas comprobaciones pendientes sin instalar PostgreSQL local. La prueba manual en navegador queda pendiente por la prohibición de `agents/instructions_1.md`. No se usaron credenciales externas para pruebas manuales de S3/Resend/reCAPTCHA.
+- Pendiente antes de marcar 1B como completada: aplicar la migración en una base `club_test`, ejecutar `RUN_DB_TESTS=1 pnpm test`, ejecutar el seed y verificar el flujo de login. El usuario eligió dejar estas comprobaciones pendientes sin instalar PostgreSQL local. La prueba manual en navegador queda pendiente por la prohibición de `agents/instructions_1.md`. No se usaron credenciales externas para pruebas manuales de S3/Resend.
 
 ## 2026-10-08 · Fases 2–5 (implementación de código local, sin AWS)
 
 - Por instrucción posterior del usuario se avanzó con todas las fases del PROMPT 2 en esta ejecución. No se usó AWS ni se desplegó nada.
-- Fase 2: inscripción con cédula validada, QR de tienda, consentimiento, reCAPTCHA, correo de bienvenida poscommit, baja idempotente con confirmación, clientes y saldo de lotes vigentes. Pantallas públicas y de clientes conectadas.
+- Fase 2: inscripción con cédula validada, QR de tienda, consentimiento, correo de bienvenida poscommit, baja idempotente con confirmación, clientes y saldo de lotes vigentes. Pantallas públicas y de clientes conectadas.
 - Fase 3: canje atómico con bloqueo de cliente, producto por empresa/zona, límites diario y mensual, consumo FIFO y auditoría transaccional; historial y pantallas de asesor/admin.
 - Fase 4: dados físicos con tirada única, compra superior a USD 10, ganador calculado en servidor, premio elegible, historial y gestión de premios. El asesor tiene asistente por pasos.
 - Fase 5: catálogo con URL de lectura S3 y edición restringida; canjeables y premios por zona; zonas con mapa Leaflet/OSM y soft delete; ajustes visuales; usuarios y perfil; dashboard y rotación; auditoría de solo lectura. Se agregaron loaders mock para canjeables, premios y ventas.
 - Verificaciones locales: `pnpm -r typecheck` pasó; `pnpm lint` pasó; `pnpm knip` pasó; `pnpm format:check` pasó; `pnpm build` compiló API y ambos frontends. `pnpm test`: **18 pasaron, 14 omitidas** (integración PostgreSQL). Las pruebas de integración están escritas, pero se omiten hasta tener PostgreSQL `club_test` y ejecutar `RUN_DB_TESTS=1`. No se afirma que los flujos transaccionales estén validados en base real.
-- Pendiente de prueba manual: navegador (restricción de `agents/instructions_1.md`), correo Resend, reCAPTCHA real, subida/lectura S3 y mapa con teselas OSM. Tampoco se han ejecutado seed ni loaders, pues este equipo no tiene PostgreSQL/Docker y el usuario eligió dejar esas pruebas pendientes.
+- Pendiente de prueba manual: navegador (restricción de `agents/instructions_1.md`), correo Resend, subida/lectura S3 y mapa con teselas OSM. Tampoco se han ejecutado seed ni loaders, pues este equipo no tiene PostgreSQL/Docker y el usuario eligió dejar esas pruebas pendientes.
 - Para completar la validación cuando se autorice un entorno: aplicar migración, ejecutar seed y loaders `db:mock:*`, correr integración contra `club_test`, revisar flujos en navegador autorizado y resolver TLS hasta origen antes de desplegar.
 
 ## 2026-10-08 · Validación AWS y preparación de producción
@@ -51,3 +51,8 @@
 - La EC2 conserva el checkout `dev` y el volumen `club_fidelizacion_postgres_prod_data`. Su `.env` aún utiliza nombres antiguos y carece de las variables requeridas por el código actual.
 - Se incorporaron Dockerfiles del workspace real, nginx, Compose de producción, CI con PostgreSQL aislado y despliegue manual vía SSM en worktree separado. Ningún archivo de producción nuevo se ha desplegado en EC2 en esta fase.
 - Pendientes: resultado efectivo del nuevo CI con las 14 pruebas de integración, completar `.env` de EC2, backup/restore PostgreSQL, resolver TLS y autenticación al origen, validar servicios externos y ejecutar manualmente el despliegue sólo después de esas puertas.
+
+## 2026-10-08 · EnlaceHermano
+
+- Nombre visible actualizado a **EnlaceHermano** en formulario, panel, títulos, correo y documentación. Se conservan los IDs de AWS, el volumen y los nombres internos de cookie/API para no romper despliegues existentes.
+- El registro ya no solicita ni verifica un desafío externo. Se retiraron el cliente, el validador, las variables y las pruebas de esa integración. Permanecen la validación de datos, consentimiento y límite de solicitudes del servidor.
