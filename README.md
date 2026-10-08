@@ -24,3 +24,22 @@ La API escucha en `http://localhost:3000/api`, el formulario en `http://localhos
 El schema de Prisma está en `hackaton-backend/prisma/schema.prisma`. Para migración, seed y pruebas de integración hace falta PostgreSQL en un entorno privado; no se han ejecutado aquí por decisión del usuario. `pnpm -r typecheck`, `pnpm lint`, `pnpm test`, `pnpm knip`, `pnpm format:check` y `pnpm build` verifican el código sin usar AWS. Consulta `docs/PROGRESS.md` para resultados y pendientes.
 
 El stack de producción y la validación AWS están en `docs/DEPLOYMENT.md`. El workflow de despliegue es manual y no debe ejecutarse hasta completar sus prerrequisitos.
+
+## Credenciales de prueba
+
+Datos sintéticos del hackatón (`pnpm db:seed:all`), iguales en local y producción:
+
+| Rol           | Correo                   | Contraseña   |
+| ------------- | ------------------------ | ------------ |
+| Administrador | `admin@farmaenlace.com`  | `Admin123!`  |
+| Asesor        | `asesor@farmaenlace.com` | `Asesor123!` |
+
+## Tiendas y QR del formulario
+
+El formulario identifica la tienda con el parámetro `t` (código de tienda). Cada QR apunta a:
+
+| Tienda                       | Zona             | Código       | URL producción                                      | URL local                           |
+| ---------------------------- | ---------------- | ------------ | --------------------------------------------------- | ----------------------------------- |
+| FarmaEnlace Quito Norte      | Quito Norte      | `FE-QN-001`  | https://d39zayal0ay0sg.cloudfront.net/?t=FE-QN-001  | http://localhost:5173/?t=FE-QN-001  |
+| FarmaEnlace Quito Sur        | Quito Sur        | `FE-QS-001`  | https://d39zayal0ay0sg.cloudfront.net/?t=FE-QS-001  | http://localhost:5173/?t=FE-QS-001  |
+| FarmaEnlace Guayaquil Centro | Guayaquil Centro | `FE-GYE-001` | https://d39zayal0ay0sg.cloudfront.net/?t=FE-GYE-001 | http://localhost:5173/?t=FE-GYE-001 |

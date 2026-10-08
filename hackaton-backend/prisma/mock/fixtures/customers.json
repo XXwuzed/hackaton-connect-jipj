@@ -6,12 +6,21 @@
       "firstName": "Cliente",
       "lastName": "Sintético Uno",
       "email": "cliente001@example.com",
-      "storeCode": "DEMO001",
+      "storeCode": "FE-QN-001",
       "status": "ACTIVE",
       "lots": [
-        { "points": 30, "earnedDaysAgo": 367 },
-        { "points": 40, "earnedDaysAgo": 364 },
-        { "points": 80, "earnedDaysAgo": 20 }
+        {
+          "points": 30,
+          "earnedDaysAgo": 367
+        },
+        {
+          "points": 40,
+          "earnedDaysAgo": 364
+        },
+        {
+          "points": 80,
+          "earnedDaysAgo": 20
+        }
       ]
     },
     {
@@ -19,9 +28,14 @@
       "firstName": "Cliente",
       "lastName": "Sintético Dos",
       "email": "cliente002@example.com",
-      "storeCode": "DEMO001",
+      "storeCode": "FE-QS-001",
       "status": "UNSUBSCRIBED",
-      "lots": [{ "points": 20, "earnedDaysAgo": 10 }]
+      "lots": [
+        {
+          "points": 20,
+          "earnedDaysAgo": 10
+        }
+      ]
     }
   ]
 }

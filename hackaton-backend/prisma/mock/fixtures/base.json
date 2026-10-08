@@ -1,23 +1,56 @@
 {
   "synthetic": true,
-  "company": { "name": "Empresa Demo Sintética" },
-  "zone": {
-    "name": "Zona Demo Sintética",
-    "centerLat": -0.180653,
-    "centerLng": -78.467834,
-    "radiusMeters": 1000
+  "company": {
+    "name": "Empresa Demo Sintética"
   },
-  "store": { "code": "DEMO001", "name": "Tienda Demo Sintética" },
+  "zones": [
+    {
+      "name": "Quito Norte",
+      "centerLat": -0.13,
+      "centerLng": -78.48,
+      "radiusMeters": 3000
+    },
+    {
+      "name": "Quito Sur",
+      "centerLat": -0.27,
+      "centerLng": -78.54,
+      "radiusMeters": 3000
+    },
+    {
+      "name": "Guayaquil Centro",
+      "centerLat": -2.19,
+      "centerLng": -79.8875,
+      "radiusMeters": 3000
+    }
+  ],
+  "stores": [
+    {
+      "code": "FE-QN-001",
+      "name": "FarmaEnlace Quito Norte",
+      "zoneName": "Quito Norte"
+    },
+    {
+      "code": "FE-QS-001",
+      "name": "FarmaEnlace Quito Sur",
+      "zoneName": "Quito Sur"
+    },
+    {
+      "code": "FE-GYE-001",
+      "name": "FarmaEnlace Guayaquil Centro",
+      "zoneName": "Guayaquil Centro"
+    }
+  ],
   "users": {
     "admin": {
-      "email": "admin@example.com",
-      "firstName": "Admin",
-      "lastName": "Demo"
+      "email": "admin@farmaenlace.com",
+      "firstName": "Administrador",
+      "lastName": "FarmaEnlace"
     },
     "advisor": {
-      "email": "advisor@example.com",
+      "email": "asesor@farmaenlace.com",
       "firstName": "Asesor",
-      "lastName": "Demo"
+      "lastName": "FarmaEnlace",
+      "storeCode": "FE-QN-001"
     }
   },
   "products": [

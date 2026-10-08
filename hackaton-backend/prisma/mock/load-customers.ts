@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 import { nationalIdSchema } from '@club/contracts';
 import { addOneYearEndOfDay } from '../../src/shared/time';
-import { loadRows } from './shared';
+import { assertSeedAllowed, loadRows } from './shared';
 
 const lotSchema = z
   .object({
@@ -35,8 +35,7 @@ function lotId(nationalId: string, index: number): string {
 
 /** Carga clientes y lotes de prueba sin duplicarlos al repetir la orden. */
 async function main() {
-  if (process.env.NODE_ENV === 'production')
-    throw new Error('No cargar mock en producción');
+  assertSeedAllowed();
   const { rows, source } = loadRows(
     'customers',
     'customers',
@@ -77,7 +76,7 @@ async function main() {
   }
   const prisma = new PrismaClient();
   try {
-    for (const [row, input] of grouped.values().entries()) {
+    for (const [row, input] of [...grouped.values()].entries()) {
       const store = await prisma.store.findUnique({
         where: { code: input.storeCode },
         select: { id: true, zoneId: true },

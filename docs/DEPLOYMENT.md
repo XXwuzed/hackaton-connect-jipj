@@ -31,3 +31,14 @@ El `.env` de la EC2 todavía contiene nombres antiguos (`JWT_SECRET`, `CORS_ORIG
 ## Comprobación posterior
 
 Tras un despliegue manual autorizado, `/api/health` debe devolver exactamente `{"status":"ok"}`; la API placeholder actual devuelve además `app` y `timestamp`. Confirmar que `/` carga el formulario real y `/admin/` el panel real en sus dominios, que los tres contenedores estén saludables y que S3 y Resend funcionen con credenciales de producción. El simple HTTP 200 del stub no valida la aplicación.
+
+## Seed sintético en producción (hackatón)
+
+Producción usa la misma data sintética de pruebas. Se carga manualmente, una vez, tras el primer deploy (es idempotente):
+
+```bash
+docker compose -f docker-compose.prod.yml run --rm \
+  -e SEED_ALLOW_PRODUCTION=true \
+  -e SEED_ADMIN_PASSWORD -e SEED_ADVISOR_PASSWORD \
+  migrate pnpm --filter @club/api seed:all
+```
