@@ -35,44 +35,85 @@ export default function Users(): JSX.Element {
   const [zoneId, setZoneId] = useState('');
   const [storeId, setStoreId] = useState('');
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+  const [saving, setSaving] = useState(false);
   const [temporaryPassword, setTemporaryPassword] = useState('');
   const query = useQuery({
     queryKey: ['users'],
     queryFn: () => apiRequest<Result>('/users?pageSize=50'),
   });
-  async function act(task: () => Promise<unknown>) {
+  // Tiendas válidas para la empresa y zona elegidas (el backend exige que coincidan).
+  const storeOptions =
+    query.data?.options.stores.filter(
+      (option) => option.companyId === companyId && option.zoneId === zoneId,
+    ) ?? [];
+  const missing = [
+    !email && 'correo',
+    !firstName && 'nombre',
+    !lastName && 'apellido',
+    role === 'ADVISOR' && !companyId && 'empresa',
+    role === 'ADVISOR' && !zoneId && 'zona',
+    role === 'ADVISOR' && !storeId && 'tienda',
+  ].filter(Boolean);
+  function resetForm() {
+    setEditingId(null);
+    setEmail('');
+    setFirstName('');
+    setLastName('');
+    setRole('ADVISOR');
+    setCompanyId('');
+    setZoneId('');
+    setStoreId('');
+  }
+  /** Mantiene la tienda si sigue siendo válida; si hay una sola opción, la elige. */
+  function pickStore(nextCompanyId: string, nextZoneId: string) {
+    const valid =
+      query.data?.options.stores.filter(
+        (option) =>
+          option.companyId === nextCompanyId && option.zoneId === nextZoneId,
+      ) ?? [];
+    if (valid.some((option) => option.id === storeId)) return;
+    setStoreId(valid.length === 1 ? valid[0]!.id : '');
+  }
+  async function act(task: () => Promise<unknown>, success: string) {
     setError('');
+    setNotice('');
+    setSaving(true);
     try {
       await task();
       await client.invalidateQueries({ queryKey: ['users'] });
+      setNotice(success);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'No se pudo guardar');
+    } finally {
+      setSaving(false);
     }
   }
   async function save() {
-    await act(async () => {
-      const result = await apiRequest<{ temporaryPassword?: string }>(
-        editingId ? `/users/${editingId}` : '/users',
-        {
-          method: editingId ? 'PATCH' : 'POST',
-          body: JSON.stringify({
-            email,
-            firstName,
-            lastName,
-            role,
-            companyId: role === 'ADMIN' ? null : companyId,
-            zoneId: role === 'ADMIN' ? null : zoneId,
-            storeId: role === 'ADMIN' ? null : storeId,
-          }),
-        },
-      );
-      if (result.temporaryPassword)
-        setTemporaryPassword(result.temporaryPassword);
-      setEditingId(null);
-      setEmail('');
-      setFirstName('');
-      setLastName('');
-    });
+    const wasEditing = Boolean(editingId);
+    await act(
+      async () => {
+        const result = await apiRequest<{ temporaryPassword?: string }>(
+          editingId ? `/users/${editingId}` : '/users',
+          {
+            method: editingId ? 'PATCH' : 'POST',
+            body: JSON.stringify({
+              email,
+              firstName,
+              lastName,
+              role,
+              companyId: role === 'ADMIN' ? null : companyId,
+              zoneId: role === 'ADMIN' ? null : zoneId,
+              storeId: role === 'ADMIN' ? null : storeId,
+            }),
+          },
+        );
+        if (result.temporaryPassword)
+          setTemporaryPassword(result.temporaryPassword);
+        resetForm();
+      },
+      wasEditing ? 'Cambios guardados' : 'Usuario creado',
+    );
   }
   async function reset(id: string) {
     await act(async () => {
@@ -81,7 +122,7 @@ export default function Users(): JSX.Element {
         { method: 'POST' },
       );
       setTemporaryPassword(result.temporaryPassword);
-    });
+    }, 'Contraseña restablecida');
   }
   return (
     <section>
@@ -146,7 +187,7 @@ export default function Users(): JSX.Element {
               value={companyId}
               onChange={(event) => {
                 setCompanyId(event.target.value);
-                setStoreId('');
+                pickStore(event.target.value, zoneId);
               }}
             >
               <option value="">Empresa</option>
@@ -162,7 +203,7 @@ export default function Users(): JSX.Element {
               value={zoneId}
               onChange={(event) => {
                 setZoneId(event.target.value);
-                setStoreId('');
+                pickStore(companyId, event.target.value);
               }}
             >
               <option value="">Zona</option>
@@ -178,34 +219,45 @@ export default function Users(): JSX.Element {
               value={storeId}
               onChange={(event) => setStoreId(event.target.value)}
             >
-              <option value="">Tienda</option>
-              {query.data?.options.stores
-                .filter(
-                  (option) =>
-                    option.companyId === companyId && option.zoneId === zoneId,
-                )
-                .map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.name}
-                  </option>
-                ))}
+              <option value="">
+                {companyId && zoneId && storeOptions.length === 0
+                  ? 'Sin tiendas en esta zona'
+                  : 'Tienda'}
+              </option>
+              {storeOptions.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.name}
+                </option>
+              ))}
             </select>
           </>
         )}
         <button
-          className="rounded bg-primary p-2 text-white"
-          disabled={
-            !email ||
-            !firstName ||
-            !lastName ||
-            (role === 'ADVISOR' && (!companyId || !zoneId || !storeId))
-          }
+          className="rounded bg-primary p-2 text-white disabled:cursor-not-allowed disabled:opacity-50"
+          disabled={saving || missing.length > 0}
           onClick={save}
         >
-          {editingId ? 'Guardar cambios' : 'Crear usuario'}
+          {saving
+            ? 'Guardando…'
+            : editingId
+              ? 'Guardar cambios'
+              : 'Crear usuario'}
         </button>
-        {editingId && (
-          <button onClick={() => setEditingId(null)}>Cancelar</button>
+        {editingId && <button onClick={resetForm}>Cancelar</button>}
+        {missing.length > 0 && (
+          <p className="w-full text-sm text-gray-600">
+            Falta: {missing.join(', ')}
+          </p>
+        )}
+        {error && (
+          <p role="alert" className="w-full text-red-700">
+            {error}
+          </p>
+        )}
+        {notice && (
+          <p role="status" className="w-full text-green-700">
+            {notice}
+          </p>
         )}
       </div>
       {query.isError && <p role="alert">No se pudieron cargar usuarios.</p>}
@@ -225,6 +277,8 @@ export default function Users(): JSX.Element {
             <button
               className="underline"
               onClick={() => {
+                setError('');
+                setNotice('');
                 setEditingId(row.id);
                 setEmail(row.email);
                 setFirstName(row.firstName);
@@ -240,11 +294,13 @@ export default function Users(): JSX.Element {
             <button
               className="underline"
               onClick={() =>
-                act(() =>
-                  apiRequest(`/users/${row.id}`, {
-                    method: 'PATCH',
-                    body: JSON.stringify({ active: !row.active }),
-                  }),
+                act(
+                  () =>
+                    apiRequest(`/users/${row.id}`, {
+                      method: 'PATCH',
+                      body: JSON.stringify({ active: !row.active }),
+                    }),
+                  row.active ? 'Usuario desactivado' : 'Usuario activado',
                 )
               }
             >
@@ -256,11 +312,6 @@ export default function Users(): JSX.Element {
           </div>
         </article>
       ))}
-      {error && (
-        <p role="alert" className="text-red-700">
-          {error}
-        </p>
-      )}
     </section>
   );
 }

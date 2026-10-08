@@ -33,3 +33,13 @@ Datos sintéticos del hackatón (`pnpm db:seed:all`), iguales en local y producc
 | ------------- | ------------------------ | ------------ |
 | Administrador | `admin@farmaenlace.com`  | `Admin123!`  |
 | Asesor        | `asesor@farmaenlace.com` | `Asesor123!` |
+
+## Tiendas y QR del formulario
+
+El formulario identifica la tienda con el parámetro `t` (código de tienda). Cada QR apunta a:
+
+| Tienda                       | Zona             | Código       | URL producción                                      | URL local                           |
+| ---------------------------- | ---------------- | ------------ | --------------------------------------------------- | ----------------------------------- |
+| FarmaEnlace Quito Norte      | Quito Norte      | `FE-QN-001`  | https://d39zayal0ay0sg.cloudfront.net/?t=FE-QN-001  | http://localhost:5173/?t=FE-QN-001  |
+| FarmaEnlace Quito Sur        | Quito Sur        | `FE-QS-001`  | https://d39zayal0ay0sg.cloudfront.net/?t=FE-QS-001  | http://localhost:5173/?t=FE-QS-001  |
+| FarmaEnlace Guayaquil Centro | Guayaquil Centro | `FE-GYE-001` | https://d39zayal0ay0sg.cloudfront.net/?t=FE-GYE-001 | http://localhost:5173/?t=FE-GYE-001 |

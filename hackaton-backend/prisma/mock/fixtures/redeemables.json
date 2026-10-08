@@ -5,13 +5,13 @@
       "sku": "DEMO-001",
       "pointsRequired": 15,
       "discountPercent": null,
-      "zoneNames": ["Zona Demo Sintética"]
+      "zoneNames": ["Quito Norte", "Quito Sur", "Guayaquil Centro"]
     },
     {
       "sku": "DEMO-002",
       "pointsRequired": 25,
       "discountPercent": 5,
-      "zoneNames": ["Zona Demo Sintética"]
+      "zoneNames": ["Quito Norte", "Quito Sur", "Guayaquil Centro"]
     }
   ]
 }

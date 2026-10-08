@@ -10,13 +10,25 @@ const SEED_PASSWORD_MIN_LENGTH = 8; // Contraseñas demo del hackatón (ej. Admi
 const baseSchema = z.object({
   synthetic: z.literal(true),
   company: z.object({ name: z.string().min(1) }),
-  zone: z.object({
-    name: z.string().min(1),
-    centerLat: z.number().min(-90).max(90),
-    centerLng: z.number().min(-180).max(180),
-    radiusMeters: z.number().int().positive(),
-  }),
-  store: z.object({ code: z.string().min(1), name: z.string().min(1) }),
+  zones: z
+    .array(
+      z.object({
+        name: z.string().min(1),
+        centerLat: z.number().min(-90).max(90),
+        centerLng: z.number().min(-180).max(180),
+        radiusMeters: z.number().int().positive(),
+      }),
+    )
+    .min(1),
+  stores: z
+    .array(
+      z.object({
+        code: z.string().min(1),
+        name: z.string().min(1),
+        zoneName: z.string().min(1),
+      }),
+    )
+    .min(1),
   users: z.object({
     admin: z.object({
       email: z.string().email(),
@@ -27,6 +39,7 @@ const baseSchema = z.object({
       email: z.string().email(),
       firstName: z.string(),
       lastName: z.string(),
+      storeCode: z.string().min(1),
     }),
   }),
   products: z
@@ -79,18 +92,39 @@ async function main(): Promise<void> {
       create: data.company,
       update: { active: true },
     });
-    const zone = await prisma.zone.upsert({
-      where: { name: data.zone.name },
-      create: data.zone,
-      update: { active: true, deletedAt: null },
-    });
-    const store = await prisma.store.upsert({
-      where: { code: data.store.code },
-      create: { ...data.store, companyId: company.id, zoneId: zone.id },
-      update: { active: true, companyId: company.id, zoneId: zone.id },
-    });
+    const zoneIds = new Map<string, string>();
+    for (const zoneData of data.zones) {
+      const zone = await prisma.zone.upsert({
+        where: { name: zoneData.name },
+        create: zoneData,
+        update: { active: true, deletedAt: null },
+      });
+      zoneIds.set(zone.name, zone.id);
+    }
+    const stores = new Map<string, { id: string; zoneId: string }>();
+    for (const { zoneName, ...storeData } of data.stores) {
+      const zoneId = zoneIds.get(zoneName);
+      if (!zoneId)
+        throw new Error(
+          `Tienda ${storeData.code}: zona ${zoneName} no definida`,
+        );
+      const store = await prisma.store.upsert({
+        where: { code: storeData.code },
+        create: { ...storeData, companyId: company.id, zoneId },
+        update: {
+          name: storeData.name,
+          active: true,
+          companyId: company.id,
+          zoneId,
+        },
+      });
+      stores.set(store.code, { id: store.id, zoneId });
+    }
     const admin = data.users.admin;
-    const advisor = data.users.advisor;
+    const { storeCode: advisorStoreCode, ...advisor } = data.users.advisor;
+    const advisorStore = stores.get(advisorStoreCode);
+    if (!advisorStore)
+      throw new Error(`Asesor: tienda ${advisorStoreCode} no definida`);
     await prisma.user.upsert({
       where: { email: admin.email },
       create: {
@@ -116,8 +150,8 @@ async function main(): Promise<void> {
         ...advisor,
         role: 'ADVISOR',
         companyId: company.id,
-        zoneId: zone.id,
-        storeId: store.id,
+        zoneId: advisorStore.zoneId,
+        storeId: advisorStore.id,
         passwordHash: await argon2.hash(advisorPassword, {
           type: argon2.argon2id,
         }),
@@ -131,8 +165,8 @@ async function main(): Promise<void> {
         }),
         active: true,
         companyId: company.id,
-        zoneId: zone.id,
-        storeId: store.id,
+        zoneId: advisorStore.zoneId,
+        storeId: advisorStore.id,
       },
     });
     await prisma.loyaltySettings.upsert({
@@ -152,7 +186,7 @@ async function main(): Promise<void> {
       });
     }
     process.stdout.write(
-      `Seed sintético: ${data.products.length} productos, 2 usuarios.\n`,
+      `Seed sintético: ${data.zones.length} zonas, ${data.stores.length} tiendas, ${data.products.length} productos, 2 usuarios.\n`,
     );
   } finally {
     await prisma.$disconnect();
