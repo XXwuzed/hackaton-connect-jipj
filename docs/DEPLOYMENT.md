@@ -19,7 +19,7 @@ Estado comprobado el 2026-10-08: `main` contiene la app de Fases 1A–5, pero la
 
 ## Preparación obligatoria antes del primer despliegue
 
-1. Revisar los resultados de CI y las 14 pruebas de integración. No asumir que pasaron sólo porque el workflow existe.
+1. El [CI de `a6fc4d2`](https://github.com/XXwuzed/hackaton-connect-jipj/actions/runs/37826731307) terminó correctamente: migración, pruebas con PostgreSQL aislado, build de API/frontends y Docker/nginx. Revalidar el CI tras cada cambio antes de desplegar.
 2. Respaldar el volumen PostgreSQL y ensayar restauración. No se hizo durante esta validación.
 3. Actualizar **privadamente** `/opt/hackaton/.env`, sin reemplazar `POSTGRES_USER`, `POSTGRES_PASSWORD` ni `POSTGRES_DB` actuales. Usar `.env.production.example` como lista de nombres, no copiar sus placeholders. `DATABASE_URL` debe apuntar a `postgres:5432/farmaenlace_prod` y codificar caracteres especiales de la contraseña.
 4. Configurar dos secretos JWT distintos de 32+ caracteres, `CONSENT_VERSION` aprobado, URLs CloudFront, bucket y Resend. No introducir claves AWS en el `.env` de EC2.

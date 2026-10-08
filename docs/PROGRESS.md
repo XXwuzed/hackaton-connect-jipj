@@ -50,7 +50,8 @@
 - Verificado en AWS: EC2 `t3.medium` Amazon Linux 2023 y SSM Online; SG sólo puerto 80 desde CloudFront; dos distribuciones con caché desactivada y cookies reenviadas; bucket privado S3, cifrado SSE-S3, CORS para ambos dominios; rol EC2 con acceso S3 y hop limit IMDSv2 de 2.
 - La EC2 conserva el checkout `dev` y el volumen `club_fidelizacion_postgres_prod_data`. Su `.env` aún utiliza nombres antiguos y carece de las variables requeridas por el código actual.
 - Se incorporaron Dockerfiles del workspace real, nginx, Compose de producción, CI con PostgreSQL aislado y despliegue manual vía SSM en worktree separado. Ningún archivo de producción nuevo se ha desplegado en EC2 en esta fase.
-- Pendientes: resultado efectivo del nuevo CI con las 14 pruebas de integración, completar `.env` de EC2, backup/restore PostgreSQL, resolver TLS y autenticación al origen, validar servicios externos y ejecutar manualmente el despliegue sólo después de esas puertas.
+- El CI de `a6fc4d2` terminó correctamente: migración en `club_test`, pruebas de integración, tipos, lint, formato, builds de código y ambos contenedores, `docker compose config` y `nginx -t`.
+- Pendientes: completar `.env` de EC2, backup/restore PostgreSQL, resolver TLS y autenticación al origen, validar servicios externos y ejecutar manualmente el despliegue sólo después de esas puertas.
 
 ## 2026-10-08 · EnlaceHermano
 
